@@ -389,9 +389,6 @@
     <div class="toast-container" id="tContainer"></div>
 
     <script>
-        // ==========================================
-        // 🔮 LOGIC & TRANSLATIONS
-        // ==========================================
         const i18n = {
             ru: { app_title:"Приложения", nav_tasks:"Задачи", nav_calendar:"Календарь", nav_dashboard:"Аналитика", nav_settings:"Настройки", ws_title:"Workspaces", ws_create:"Создать", ws_personal:"Личное", ws_work:"Работа", btn_install:"Установить App", board_desc:"Управление задачами и идеями", ph_task:"Что нужно сделать? Нажмите Enter...", prio_low:"Низкий", prio_med:"Средний", prio_high:"Высокий", col_todo:"К выполнению", col_ip:"В процессе", col_done:"Готово", cal_title:"Календарь дедлайнов", dash_title:"Ваша Аналитика", dash_desc:"Статистика продуктивности", stat_done:"Задач выполнено", stat_total:"всего", stat_focus:"Фокус & XP", stat_xp_desc:"Очков (XP)", stat_pomo:"Помодоро:", stat_p_sessions:"сессий", stat_streak:"Стрик:", stat_s_days:"дней", ach_title:"Зал славы", ach1_t:"Первая кровь", ach1_d:"Добавлена первая задача", ach2_t:"Марафонец", ach2_d:"Закрыто 5 задач", ach3_t:"Томатный лорд", ach3_d:"3 фокус-сессии", ach4_t:"В ударе", ach4_d:"Стрик 3 дня", lvl_up:"УРОВЕНЬ ПОВЫШЕН!", lvl_up_msg:"Поздравляем с новым", toast_achive:"Достижение разблокировано!", pomo_mode:"Режим фокуса", pomo_end:"Отдыхаем!", lang_select:"Выберите свой язык", lang_desc:"Вы сможете изменить его позже в настройках", prompt_ws:"Название нового Workspace:", days: ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'] },
             en: { app_title:"Applications", nav_tasks:"Tasks", nav_calendar:"Calendar", nav_dashboard:"Dashboard", nav_settings:"Settings", ws_title:"Workspaces", ws_create:"Create", ws_personal:"Personal", ws_work:"Work", btn_install:"Install App", board_desc:"Manage your tasks and ideas", ph_task:"What needs to be done? Press Enter...", prio_low:"Low", prio_med:"Medium", prio_high:"High", col_todo:"To Do", col_ip:"In Progress", col_done:"Done", cal_title:"Deadline Calendar", dash_title:"Your Analytics", dash_desc:"Productivity stats", stat_done:"Tasks Completed", stat_total:"total", stat_focus:"Focus & XP", stat_xp_desc:"Productivity Points", stat_pomo:"Pomodoros:", stat_p_sessions:"sessions", stat_streak:"Streak:", stat_s_days:"days", ach_title:"Hall of Fame", ach1_t:"First Blood", ach1_d:"Added first task", ach2_t:"Marathoner", ach2_d:"Completed 5 tasks", ach3_t:"Tomato Lord", ach3_d:"3 focus sessions", ach4_t:"On Fire", ach4_d:"3-day streak", lvl_up:"LEVEL UP!", lvl_up_msg:"Congratulations on hitting level", toast_achive:"Achievement Unlocked!", pomo_mode:"Focus Mode", pomo_end:"Take a break!", lang_select:"Select Your Language", lang_desc:"You can change this later in settings", prompt_ws:"New Workspace name:", days: ['Mo','Tu','We','Th','Fr','Sa','Su'] },
@@ -406,7 +403,7 @@
         const DB_KEY = 'TF_OS_DB';
         const defaultState = {
             version: '4.0',
-            settings: { theme: '#8A2BE2', lang: null }, // lang trigger
+            settings: { theme: '#8A2BE2', lang: null },
             user: { xp: 0, level: 1, streakCount: 0, lastLoginDate: '', pomoCompleted: 0, achieved: [] },
             workspaces: [
                 { id: 'ws_default', key: 'ws_personal', icon: '🏠', color: '#3b82f6' },
@@ -416,7 +413,7 @@
             tasks: []
         };
 
-        const achivementsList = [
+        const achievementsList = [
             { id: 'a_first', icon: '👶', titleKey: 'ach1_t', descKey: 'ach1_d', req: state => state.tasks.length > 0 },
             { id: 'a_done5', icon: '🏃', titleKey: 'ach2_t', descKey: 'ach2_d', req: state => state.tasks.filter(t=>t.st==='done').length >= 5 },
             { id: 'a_pomo3', icon: '🍅', titleKey: 'ach3_t', descKey: 'ach3_d', req: state => state.user.pomoCompleted >= 3 },
@@ -428,11 +425,14 @@
         
         function saveDB() {
             localStorage.setItem(DB_KEY, JSON.stringify(db));
-            checkAchievements();
             renderUserStats();
         }
 
-        // Translation Engine
+        function persistChanges() {
+            checkAchievements();
+            saveDB();
+        }
+
         function t(key) {
             const lang = db.settings.lang || 'en';
             return i18n[lang][key] || key;
@@ -447,7 +447,6 @@
                 const k = el.getAttribute('data-i18n-placeholder');
                 el.setAttribute('placeholder', t(k));
             });
-            // Update calendar headers Day of Week
             const cd = document.getElementById('calDaysRow');
             if(cd) {
                 cd.innerHTML = i18n[db.settings.lang || 'en'].days.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
@@ -456,13 +455,12 @@
 
         function setLang(code) {
             db.settings.lang = code;
-            saveDB();
+            persistChanges();
             applyTranslations();
-            switchView('board'); // Jump to app
+            switchView('board');
             document.documentElement.lang = code;
         }
 
-        // SFX 
         const auCtx = new (window.AudioContext || window.webkitAudioContext)();
         function sfx(type) {
             if(auCtx.state==='suspended') auCtx.resume();
@@ -473,7 +471,7 @@
             if(type==='fanfare'){ o.type='square'; o.frequency.setValueAtTime(400,n); o.frequency.setValueAtTime(600,n+0.2); o.frequency.setValueAtTime(800,n+0.4); g.gain.setValueAtTime(0.3,n); g.gain.linearRampToValueAtTime(0,n+0.7); o.start(n); o.stop(n+0.7);}
         }
 
-        // --- 2. ROUTING & UI RENDER ---
+        /* --- ROUTING & UI RENDER --- */
         function switchView(viewId) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item[data-target]').forEach(n => n.classList.remove('active'));
@@ -499,22 +497,23 @@
 
         function renderWorkspaces() {
             const list = document.getElementById('wsList');
-            list.innerHTML = '';
+            const parts = [];
             db.workspaces.forEach(ws => {
                 const isActive = ws.id === db.activeWs;
-                const dName = ws.key ? t(ws.key) : ws.name;
-                list.innerHTML += `
+                const dName = ws.key ? t(ws.key) : escHtml(ws.name);
+                parts.push(`
                     <div class="nav-item ${isActive?'active':''}" style="padding-left:20px;" onclick="selectWs('${ws.id}')">
-                        <span class="workspace-badge" style="background:${ws.color};"></span>
+                        <span class="workspace-badge" style="background:${escHtml(ws.color)};"></span>
                         ${ws.icon} ${dName}
                     </div>
-                `;
+                `);
             });
+            list.innerHTML = parts.join('');
         }
 
         function selectWs(id) {
             db.activeWs = id;
-            saveDB();
+            persistChanges();
             renderWorkspaces();
             switchView('board');
         }
@@ -524,7 +523,7 @@
             if(!n) return;
             const colors = ['#f43f5e', '#8b5cf6', '#d946ef', '#10b981', '#f59e0b', '#0ea5e9'];
             db.workspaces.push({ id: 'ws_'+Date.now(), name: n, icon: '📁', color: colors[Math.floor(Math.random()*colors.length)] });
-            saveDB(); renderWorkspaces();
+            persistChanges(); renderWorkspaces();
         }
 
         function renderUserStats() {
@@ -544,15 +543,24 @@
                 showToast(t('lvl_up'), `${t('lvl_up_msg')} ${db.user.level}!`, '🆙');
                 sfx('fanfare');
             }
-            saveDB();
         }
 
-        // --- 3. BOARD & TASKS LOGIC ---
+        /* --- BOARD & TASKS LOGIC --- */
+        function escHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function pMd(str) {
-            return str.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-                      .replace(/\*(.*?)\*/g, '<i>$1</i>')
-                      .replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.2);padding:2px 4px;border-radius:4px;">$1</code>')
-                      .replace(/~~(.*?)~~/g, '<del>$1</del>');
+            const safe = escHtml(str);
+            return safe.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                       .replace(/\*(.*?)\*/g, '<i>$1</i>')
+                       .replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.2);padding:2px 4px;border-radius:4px;">$1</code>')
+                       .replace(/~~(.*?)~~/g, '<del>$1</del>');
         }
 
         let boardIsList = false;
@@ -564,7 +572,7 @@
         function renderBoard() {
             const ws = db.workspaces.find(w => w.id === db.activeWs);
             const dName = ws.key ? t(ws.key) : ws.name;
-            document.getElementById('currentWsTitle').innerHTML = `${ws.icon} ${dName}`;
+            document.getElementById('currentWsTitle').textContent = `${ws.icon} ${dName}`;
 
             const tTasks = db.tasks.filter(ti => ti.wsId === ws.id);
             const cols = { todo: [], in_progress: [], done: [] };
@@ -573,10 +581,9 @@
             ['todo', 'in_progress', 'done'].forEach(col => {
                 document.getElementById(`c-${col==='in_progress'?'ip':col}`).innerText = cols[col].length;
                 const el = document.getElementById(`col-${col}`);
-                el.innerHTML = '';
-                cols[col].forEach(ti => {
+                el.innerHTML = cols[col].map(ti => {
                     const isD = ti.st === 'done';
-                    el.innerHTML += `
+                    return `
                         <div class="task-item ${isD?'done':''}" draggable="true" ondragstart="dragT(event, '${ti.id}')">
                             <div class="task-head">
                                 <label class="chk-container" onclick="event.stopPropagation()">
@@ -586,15 +593,15 @@
                                 <div class="task-title">${pMd(ti.title)}</div>
                             </div>
                             <div class="task-badges">
-                                <span class="dot p-${ti.prio}"></span>
-                                ${ti.date ? `<span class="badge"><i class="fa-solid fa-clock"></i> ${ti.date}</span>` : ''}
+                                <span class="dot p-${escHtml(ti.prio)}"></span>
+                                ${ti.date ? `<span class="badge"><i class="fa-solid fa-clock"></i> ${escHtml(ti.date)}</span>` : ''}
                             </div>
                             <div class="task-actions">
                                 <button class="act-btn del" onclick="delT('${ti.id}')"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                     `;
-                });
+                }).join('');
             });
         }
 
@@ -610,7 +617,7 @@
             document.getElementById('inpTaskLabel').value = '';
             document.getElementById('inpTaskDate').value = '';
             
-            sfx('pop'); addXp(5); renderBoard();
+            sfx('pop'); addXp(5); persistChanges(); renderBoard();
         }
 
         function toggleT(id) {
@@ -618,10 +625,10 @@
             if(ti) {
                 if(ti.st !== 'done') { ti.st = 'done'; addXp(15); sfx('pop'); }
                 else { ti.st = 'todo'; }
-                saveDB(); renderBoard();
+                persistChanges(); renderBoard();
             }
         }
-        function delT(id) { db.tasks = db.tasks.filter(x => x.id !== id); saveDB(); renderBoard(); }
+        function delT(id) { db.tasks = db.tasks.filter(x => x.id !== id); persistChanges(); renderBoard(); }
 
         let dragId = null;
         function dragT(e, id) { dragId = id; setTimeout(()=>e.target.classList.add('dragging'),0); }
@@ -632,14 +639,14 @@
                 const ti = db.tasks.find(x=>x.id === dragId);
                 if(ti && ti.st !== stat) {
                     if(stat === 'done') addXp(15);
-                    ti.st = stat; saveDB(); renderBoard();
+                    ti.st = stat; persistChanges(); renderBoard();
                 }
             }
             dragId = null; document.querySelectorAll('.dragging').forEach(n=>n.classList.remove('dragging'));
         }
         document.addEventListener('dragend', ()=> { document.querySelectorAll('.dragging').forEach(n=>n.classList.remove('dragging')); });
 
-        // --- 4. CALENDAR ---
+        /* --- CALENDAR --- */
         let calDate = new Date();
         function renderCalendar() {
             const title = document.getElementById('calMonthTitle');
@@ -647,7 +654,6 @@
             
             const monthStr = calDate.toLocaleString(db.settings.lang || 'en', { month: 'long', year: 'numeric' });
             title.innerText = monthStr.charAt(0).toUpperCase() + monthStr.slice(1);
-            grid.innerHTML = '';
 
             const y = calDate.getFullYear(), m = calDate.getMonth();
             const firstDay = new Date(y, m, 1).getDay();
@@ -663,7 +669,8 @@
             });
 
             const todayStr = new Date().toISOString().split('T')[0];
-            for(let i=0; i<offset; i++) grid.innerHTML += `<div class="cal-cell disabled"></div>`;
+            const cells = [];
+            for(let i=0; i<offset; i++) cells.push(`<div class="cal-cell disabled"></div>`);
 
             for(let d=1; d<=daysInMonth; d++) {
                 let cellDate = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -671,21 +678,22 @@
                 let tasksHtml = '';
                 if(tMap[cellDate]) {
                     tMap[cellDate].forEach(ti => {
-                        tasksHtml += `<div class="cal-task-dot" style="background:${getBadgeColor(ti.wsId)}">${ti.title}</div>`;
+                        tasksHtml += `<div class="cal-task-dot" style="background:${escHtml(getBadgeColor(ti.wsId))}">${escHtml(ti.title)}</div>`;
                     });
                 }
-                grid.innerHTML += `
+                cells.push(`
                     <div class="cal-cell ${isToday?'today':''}">
                         <div class="cal-date-num">${d}</div>
                         <div style="flex-grow:1; display:flex; flex-direction:column; gap:2px; overflow:hidden;">${tasksHtml}</div>
                     </div>
-                `;
+                `);
             }
+            grid.innerHTML = cells.join('');
         }
         function changeMonth(d) { calDate.setMonth(calDate.getMonth() + d); renderCalendar(); }
         function getBadgeColor(wsId) { const ws = db.workspaces.find(x=>x.id===wsId); return ws ? ws.color : 'var(--accent-color)'; }
 
-        // --- 5. DASHBOARD & ACHIEVEMENTS ---
+        /* --- DASHBOARD & ACHIEVEMENTS --- */
         function renderDashboard() {
             const doneC = db.tasks.filter(ti=>ti.st==='done').length;
             const total = db.tasks.length;
@@ -708,10 +716,9 @@
             `;
 
             const achGrid = document.getElementById('achievementsGrid');
-            achGrid.innerHTML = '';
-            achivementsList.forEach(a => {
+            achGrid.innerHTML = achievementsList.map(a => {
                 const isUnlocked = db.user.achieved.includes(a.id);
-                achGrid.innerHTML += `
+                return `
                     <div style="background: rgba(255,255,255,0.05); border: 1px solid ${isUnlocked?'gold':'var(--glass-border)'}; opacity: ${isUnlocked?1:0.4}; border-radius: 12px; padding:15px; width: 100%; max-width:260px; display:flex; gap:15px; align-items:center;">
                         <div style="font-size: 2.5rem; filter: ${isUnlocked?'none':'grayscale(100%)'};">${a.icon}</div>
                         <div>
@@ -720,22 +727,20 @@
                         </div>
                     </div>
                 `;
-            });
+            }).join('');
         }
 
         function checkAchievements() {
-            achivementsList.forEach(a => {
-                if(!db.user.achieved.includes(a.id)) {
-                    if(a.req(db)) {
-                        db.user.achieved.push(a.id);
-                        showToast(t('toast_achive'), t(a.titleKey), a.icon);
-                        addXp(100); sfx('fanfare');
-                    }
+            achievementsList.forEach(a => {
+                if(!db.user.achieved.includes(a.id) && a.req(db)) {
+                    db.user.achieved.push(a.id);
+                    showToast(t('toast_achive'), t(a.titleKey), a.icon);
+                    addXp(100); sfx('fanfare');
                 }
             });
         }
 
-        // --- 6. FLOATING POMODORO ---
+        /* --- FLOATING POMODORO --- */
         let pTime = 25 * 60, pInt = null, pRun = false;
         function updatePomo() {
             let m = Math.floor(pTime/60).toString().padStart(2,'0');
@@ -752,15 +757,17 @@
                     else {
                         clearInterval(pInt); pRun=false; 
                         sfx('fanfare'); showToast("Time's Up!", t('pomo_end'), "🍅");
-                        db.user.pomoCompleted++; saveDB(); addXp(50);
-                        pTime = 5 * 60; updatePomo(); // Break
+                        db.user.pomoCompleted++;
+                        addXp(50);
+                        persistChanges();
+                        pTime = 5 * 60; updatePomo();
                     }
                 }, 1000);
             }
         }
         function pomoReset() { clearInterval(pInt); pRun=false; pTime=25*60; updatePomo(); }
 
-        // --- TOAST SYSTEM ---
+        /* --- TOAST SYSTEM --- */
         function showToast(title, msg, icon) {
             const c = document.getElementById('tContainer');
             const el = document.createElement('div');
@@ -770,7 +777,7 @@
             setTimeout(() => { el.style.animation = 'fadeOut 0.5s ease forwards'; setTimeout(()=>el.remove(),500); }, 4000);
         }
 
-        // STREAK & INIT 
+        /* --- STREAK & INIT --- */
         function checkDailyStreak() {
             const today = new Date().toISOString().split('T')[0];
             if(db.user.lastLoginDate !== today) {
@@ -779,7 +786,8 @@
                 if(db.user.lastLoginDate === yestStr) db.user.streakCount++;
                 else if(db.user.lastLoginDate !== '') db.user.streakCount = 1;
                 else db.user.streakCount = 1;
-                db.user.lastLoginDate = today; saveDB();
+                db.user.lastLoginDate = today;
+                persistChanges();
             }
         }
 
@@ -796,7 +804,7 @@
             }
         });
 
-        // TG Bot Reminders
+        /* --- TG BOT REMINDERS --- */
         setInterval(() => {
             const TG_BOT = localStorage.getItem('TF_TG_BOT');
             const TG_CHAT = localStorage.getItem('TF_TG_CHAT');
@@ -807,12 +815,13 @@
                     fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage`, {
                         method: 'POST', headers:{'Content-Type':'application/json'},
                         body: JSON.stringify({ chat_id: TG_CHAT, text: `⚠️ ДЕДЛАЙН!\n\n${ti.title}` })
-                    }).then(r => { if(r.ok) { ti.reminded = true; saveDB(); } });
+                    }).then(r => { if(r.ok) { ti.reminded = true; saveDB(); } })
+                      .catch(() => {});
                 }
             });
         }, 60000);
 
-        // PWA
+        /* --- PWA --- */
         const swCode = `self.addEventListener('install', (e) => { self.skipWaiting(); }); self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(()=>new Response("Offline Mode"))); });`;
         let swBlob = new Blob([swCode], {type: 'application/javascript'});
         if ('serviceWorker' in navigator) navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log(err));
