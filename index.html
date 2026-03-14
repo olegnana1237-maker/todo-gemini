@@ -2,795 +2,815 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskFlow Elite v3.0 Ultimate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- PWA Meta tags -->
+    <meta name="theme-color" content="#0b0f19">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>TaskFlow Elite v4.0 OS</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
+        /* --- CSS Reset & Variables --- */
         :root {
             --bg-color: #0b0f19;
+            --sidebar-bg: rgba(0, 0, 0, 0.4);
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-            --accent-color: #8A2BE2; /* Default VIOLET, will be changeable */
+            --accent-color: #8A2BE2;
             --accent-hover: #9b4dff;
-            --success-color: #00E676; 
+            --success-color: #00E676;
             --danger-color: #ff3b30;
             --text-main: #ffffff;
             --text-muted: rgba(255, 255, 255, 0.5);
             
-            --priority-low: #3b82f6;
-            --priority-medium: #f59e0b;
-            --priority-high: #ef4444;
-
-            --radius: 20px;
-            --transition: all 0.3s ease;
+            --priority-low: #3b82f6; --priority-medium: #f59e0b; --priority-high: #ef4444;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-lg: 20px; --radius-md: 12px; --radius-sm: 8px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-
+        
         body {
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(circle at 15% 50%, rgba(var(--accent-color-rgb, 138, 43, 226), 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 15% 50%, rgba(var(--accent-rgb, 138,43,226), 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 85% 30%, rgba(0, 230, 118, 0.1) 0%, transparent 50%);
-            background-size: cover;
-            background-attachment: fixed;
+            background-size: cover; background-attachment: fixed;
             color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 40px 20px;
-            overflow-x: hidden;
-            transition: background-image 0.5s;
+            overflow: hidden; /* App feels like OS */
+            display: flex; height: 100vh; width: 100vw;
         }
 
-        .app-container {
-            width: 100%;
-            max-width: 1200px; /* Made wider for Kanban */
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            box-shadow: var(--glass-shadow);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            position: relative;
-            overflow: hidden;
+        /* --- OS Layout --- */
+        .sidebar {
+            width: 260px; min-width: 260px; height: 100%; background: var(--sidebar-bg);
+            backdrop-filter: blur(20px); border-right: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; padding: 20px; transition: transform 0.3s ease;
+            z-index: 100;
         }
 
-        /* Top Settings & Level Bar */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.2);
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            flex-wrap: wrap;
-            gap: 10px;
+        .main-content {
+            flex-grow: 1; height: 100%; display: flex; flex-direction: column;
+            overflow-y: auto; padding: 30px; position: relative; scroll-behavior: smooth;
         }
 
-        .xp-widget {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        /* Sidebar Elements */
+        .brand { font-size: 1.5rem; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .brand i { color: var(--accent-color); }
         
-        .xp-level {
-            font-weight: bold;
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 1.1rem;
+        .user-widget {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-md);
+            padding: 15px; margin-bottom: 30px; display: flex; flex-direction: column; gap: 8px; cursor: pointer;
         }
+        .user-top { display: flex; justify-content: space-between; align-items: center; }
+        .user-top span { font-weight: 600; }
+        .user-top .fire { color: #f59e0b; font-size: 0.9rem; font-weight: bold; }
+        .xp-bar-container { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        .xp-bar { height: 100%; background: var(--accent-color); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 10px var(--accent-color); }
+
+        .nav-section { margin-bottom: 25px; }
+        .nav-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 10px; padding-left: 10px; }
         
-        .xp-bar-container {
-            width: 150px;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 15px; border-radius: var(--radius-sm);
+            color: var(--text-muted); cursor: pointer; transition: var(--transition); margin-bottom: 5px; text-decoration: none;
         }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .nav-item.active { background: var(--accent-color); color: white; box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3); }
         
-        .xp-bar {
-            height: 100%;
-            background: var(--accent-color);
-            width: 0%;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px var(--accent-color);
+        .workspace-badge { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        
+        .btn-install { 
+            margin-top: auto; background: rgba(0, 230, 118, 0.1); border: 1px solid rgba(0, 230, 118, 0.3);
+            color: var(--success-color); padding: 12px; border-radius: var(--radius-md); cursor: pointer;
+            display: none; justify-content: center; align-items: center; gap: 8px; font-weight: 500; transition: var(--transition);
         }
+        .btn-install:hover { background: rgba(0, 230, 118, 0.2); transform: translateY(-2px); }
 
-        .app-tools {
-            display: flex;
-            gap: 10px;
-        }
+        /* --- Views System --- */
+        .view { display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.4s ease; min-height: 100%; }
+        .view.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .btn-small {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
-            color: var(--text-main); cursor: pointer; padding: 6px 12px; border-radius: 8px;
-            transition: var(--transition); display: flex; align-items: center; gap: 6px; font-size: 0.85rem;
-        }
-        .btn-small:hover { background: var(--accent-color); box-shadow: 0 0 10px rgba(138,43,226,0.3); }
+        .view-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; padding-bottom: 15px; border-bottom: 1px solid var(--glass-border); }
+        .view-header h2 { font-size: 2.2rem; font-weight: 700; margin: 0; }
+        .view-controls { display: flex; gap: 10px; }
 
-        /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
-        .title-block h1 { font-size: 2rem; font-weight: 700; }
+        /* UI Controls */
+        .meta-input { background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 10px 15px; border-radius: var(--radius-md); color: white; outline:none; transition: var(--transition); }
+        .meta-input:focus { border-color: var(--accent-color); }
+        .btn-primary { background: var(--accent-color); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-md); cursor: pointer; font-weight: 500; transition: var(--transition); display: flex; align-items: center; gap: 8px;}
+        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.4); transform: translateY(-2px);}
+        .btn-icon { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; width: 42px; height: 42px; border-radius: var(--radius-md); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: var(--transition); }
+        .btn-icon:hover { background: rgba(255,255,255,0.1); border-color: var(--text-muted); }
+
+        /* --- Task Board (List/Kanban mixed layout) --- */
+        .task-input-wrapper { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 15px; box-shadow: var(--glass-shadow); }
+        .task-input-row { display: flex; gap: 15px; }
+        .task-input-row input[type="text"] { flex-grow: 1; background: transparent; border: none; font-size: 1.1rem; color: white; outline: none;}
+        .task-meta-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .board-container { display: flex; flex-direction: row; gap: 20px; align-items: flex-start; flex-grow: 1; overflow-x: auto; padding-bottom: 20px;}
+        .board-col { flex: 1; min-width: 300px; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg); padding: 15px; border: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 10px; }
+        .board-col-header { font-weight: 600; color: var(--text-muted); padding-bottom: 10px; display: flex; justify-content: space-between;}
+        .dropzone { flex-grow: 1; min-height: 200px; display: flex; flex-direction: column; gap: 10px; }
         
-        .header-actions { display: flex; gap: 10px; align-items: center; flex-grow: 1; justify-content: flex-end; }
-        .search-input { background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 10px; padding: 10px 15px; color: var(--text-main); font-size: 0.95rem; outline: none; transition: var(--transition); width: 100%; max-width: 250px;}
-        .search-input:focus { border-color: var(--accent-color); }
-
-        /* Task Form */
-        .add-task-wrapper { background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border); display: flex; padding: 10px; gap: 10px; flex-wrap: wrap;}
-        .task-input { flex-grow: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; font-size: 1rem; min-width: 250px;}
-        .meta-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 8px 15px; border-radius: 8px; cursor:pointer;}
-        .meta-btn:hover { border-color: var(--accent-color); }
-        .btn-add { background: var(--accent-color); color: #fff; border: none; border-radius: 8px; padding: 8px 20px; cursor: pointer; font-weight: 600;}
-
-        /* Options row (hidden initially for cleaner ui) */
-        .task-options-row { display: none; width: 100%; gap: 10px; margin-top: 10px; }
-        .task-options-row.active { display: flex; }
-        .meta-input { background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 8px; border-radius: 8px; color: white; outline:none; }
-
-        /* Board / List container */
-        .view-container { min-height: 400px; display: flex; flex-direction: column; gap: 15px; }
-
-        /* Kanban Layout */
-        .kanban-board { display: none; gap: 20px; align-items: flex-start; }
-        .kanban-column { flex: 1; background: rgba(0,0,0,0.1); border-radius: 16px; padding: 15px; border: 1px solid var(--glass-border); min-height: 300px; display: flex; flex-direction: column; gap:10px; }
-        .kanban-header { font-weight: 600; text-align: center; margin-bottom: 10px; color: var(--text-muted); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px;}
-        
-        .view-kanban .kanban-board { display: flex; }
-        .view-kanban .list-board { display: none; }
-        
-        .list-board { display: flex; flex-direction: column; gap: 10px; }
+        /* List Mode Override */
+        .mode-list .board-container { flex-direction: column; }
+        .mode-list .board-col { width: 100%; min-width: auto; }
+        .mode-list .dropzone { min-height: auto; }
 
         /* Task Item */
         .task-item {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: var(--radius-md);
             padding: 15px; display: flex; flex-direction: column; gap: 10px; transition: var(--transition); cursor: grab;
             position: relative;
         }
-        .task-item:hover { border-color: var(--accent-color); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .task-item:hover { border-color: var(--accent-color); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .task-item.dragging { opacity: 0.5; border: 2px dashed var(--accent-color); }
-        .task-item.status-done { opacity: 0.7; }
-        .task-item.status-done .task-text { text-decoration: line-through; color: var(--text-muted); }
+        .task-item.done { opacity: 0.6; }
+        .task-item.done .task-title { text-decoration: line-through; color: var(--text-muted); }
 
-        .task-head { display: flex; gap: 10px; align-items: flex-start; }
+        .task-head { display: flex; gap: 12px; align-items: flex-start; }
+        .chk-container { position: relative; cursor: pointer; width: 22px; height: 22px; margin-top: 2px; }
+        .chk-container input { display: none; }
+        .chk-mark { position: absolute; top:0; left:0; width: 22px; height: 22px; border: 2px solid var(--glass-border); border-radius: 6px; transition: 0.2s; }
+        .chk-container input:checked ~ .chk-mark { background: var(--success-color); border-color: var(--success-color); }
+        .task-title { flex-grow: 1; font-size: 1rem; line-height: 1.4; word-break: break-word; }
         
-        .checkbox-container { display: block; position: relative; cursor: pointer; width: 20px; height: 20px; margin-top: 3px; }
-        .checkbox-container input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-        .checkmark { position: absolute; top: 0; left: 0; height: 20px; width: 20px; background-color: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); border-radius: 4px; transition: var(--transition); }
-        .checkbox-container input:checked ~ .checkmark { background-color: var(--success-color); border-color: var(--success-color); }
-        .checkmark:after { content: ""; position: absolute; display: none; left: 6px; top: 2px; width: 4px; height: 9px; border: solid var(--bg-color); border-width: 0 2px 2px 0; transform: rotate(45deg); }
-        .checkbox-container input:checked ~ .checkmark:after { display: block; }
-
-        .task-text { flex-grow: 1; word-break: break-word; line-height: 1.4; font-size: 0.95rem; }
-        .task-text strong { color: var(--accent-color); }
-
-        /* Subtasks styling */
-        .subtasks-list { margin-top: 5px; list-style: none; display: flex; flex-direction: column; gap: 5px; font-size: 0.85rem; color: var(--text-muted); }
-        .subtask-item { display: flex; align-items: center; gap: 8px; cursor: pointer; transition: color 0.2s; }
-        .subtask-item:hover { color: white; }
-        .subtask-box { width: 14px; height: 14px; border: 1px solid var(--text-muted); border-radius: 3px; display: flex; align-items: center; justify-content: center; }
-        .subtask-item.done .subtask-box { background: var(--success-color); border-color: var(--success-color); }
-        .subtask-item.done span { text-decoration: line-through; }
-
-        .task-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .task-badges { display: flex; gap: 5px; flex-wrap: wrap; }
-        .task-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); }
-        .priority-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        .p-high { background: var(--danger-color); box-shadow: 0 0 5px var(--danger-color);}
-        .p-medium { background: var(--priority-medium); box-shadow: 0 0 5px var(--priority-medium);}
-        .p-low { background: var(--priority-low); box-shadow: 0 0 5px var(--priority-low);}
-
-        .task-actions { display: flex; gap: 5px; opacity: 0; transition: var(--transition); }
+        .task-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+        .badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        
+        .task-actions { position: absolute; right: 10px; top: 10px; display: flex; gap: 5px; opacity: 0; transition: 0.2s; }
         .task-item:hover .task-actions { opacity: 1; }
-        .btn-action { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem; }
-        .btn-action:hover { color: var(--accent-color); }
-        .btn-action.del:hover { color: var(--danger-color); }
+        .act-btn { background: var(--bg-color); border: 1px solid var(--glass-border); color: var(--text-muted); padding: 5px; border-radius: 6px; cursor: pointer; }
+        .act-btn:hover { color: white; border-color: white; }
+        .act-btn.del:hover { color: var(--danger-color); border-color: var(--danger-color); }
 
-        /* Pomodoro Floating Widget */
-        .pomodoro-widget {
-            position: fixed; bottom: 30px; right: 30px; background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 20px; box-shadow: var(--glass-shadow); display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 100;
-            width: 200px;
+        /* --- Dashboard (Charts) --- */
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .dash-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--glass-shadow); position: relative;}
+        .dash-card h3 { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 20px; align-self: flex-start; }
+        .stat-huge { font-size: 3rem; font-weight: 700; color: var(--accent-color); }
+        .chart-container { width: 200px; height: 200px; position: relative; }
+        /* SVG Charts styling handles inline */
+
+        /* --- Calendar Grid --- */
+        .calendar-wrap { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--glass-shadow); }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .cal-header h3 { font-size: 1.5rem; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .cal-day-name { text-align: center; color: var(--text-muted); font-weight: 600; font-size: 0.9rem; padding-bottom: 10px; }
+        .cal-cell { aspect-ratio: 1; background: rgba(0,0,0,0.2); border-radius: var(--radius-md); border: 1px solid var(--glass-border); padding: 10px; position: relative; cursor: pointer; transition: 0.2s; overflow: hidden; display: flex; flex-direction: column; gap: 5px;}
+        .cal-cell:hover { border-color: var(--accent-color); background: rgba(138,43,226,0.1); }
+        .cal-cell.disabled { opacity: 0.3; pointer-events: none; }
+        .cal-cell.today { border-color: var(--accent-color); box-shadow: inset 0 0 15px rgba(138,43,226,0.2); }
+        .cal-date-num { font-weight: 600; font-size: 1.1rem; }
+        .cal-task-dot { background: var(--accent-color); color: white; font-size: 0.6rem; padding: 2px 4px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* --- Achievement Toast --- */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.2)); backdrop-filter: blur(10px); border: 1px solid gold; border-radius: var(--radius-md); padding: 15px 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 30px rgba(255,215,0,0.3); animation: slideInX 0.5s ease forwards; }
+        .toast-icon { font-size: 2rem; }
+        .toast-text h4 { color: gold; margin-bottom: 5px; }
+        .toast-text p { font-size: 0.85rem; color: white; }
+        @keyframes slideInX { from { transform: translateX(120%); } to { transform: translateX(0); } }
+        @keyframes fadeOut { to { opacity: 0; } }
+
+        /* --- Focus / Pomodoro Modal Widget --- */
+        .floating-pomodoro { position: fixed; bottom: 30px; right: 30px; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--glass-shadow); display: flex; flex-direction: column; align-items: center; z-index: 1000; transition: 0.3s; transform: scale(0.9); transform-origin: bottom right;}
+        .floating-pomodoro:hover { transform: scale(1); }
+        .pomo-time { font-size: 3rem; font-weight: bold; color: var(--accent-color); font-variant-numeric: tabular-nums; line-height: 1; margin: 10px 0;}
+        .pomo-btn-wrap { display: flex; gap: 10px; }
+
+        /* Setup Modal */
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2000; display: none; justify-content: center; align-items: center;}
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: var(--bg-color); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 30px; width: 90%; max-width: 450px; position: relative;}
+        .btn-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: gray; font-size: 1.5rem; cursor: pointer; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; min-height: 60px; padding: 10px 20px; flex-direction: row; align-items: center; justify-content: space-between; overflow-x: auto; background: var(--bg-color); border-right: none; border-bottom: 1px solid var(--glass-border); z-index: 900;}
+            .brand { margin: 0; font-size: 1.2rem; }
+            .user-widget { display: none; }
+            .nav-section { display: flex; margin: 0; padding: 0; gap: 10px; }
+            .nav-title { display: none; }
+            .nav-item { margin: 0; padding: 8px 12px; white-space: nowrap; }
+            .main-content { padding: 15px; }
+            .dash-grid { grid-template-columns: 1fr; }
+            .cal-cell { padding: 5px; }
+            .cal-date-num { font-size: 0.9rem; }
         }
-        .pomo-header { font-size: 0.85rem; font-weight: bold; color: var(--text-muted); }
-        .pomo-time { font-size: 2.5rem; font-weight: 700; color: var(--accent-color); text-shadow: 0 0 10px rgba(138,43,226,0.5); font-variant-numeric: tabular-nums;}
-        .pomo-controls { display: flex; gap: 10px; }
-        .pomo-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; font-size: 1rem; transition: var(--transition);}
-        .pomo-btn:hover { background: var(--accent-color); }
 
-        /* Modals */
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; }
-        .modal.active { display: flex; animation: fadeIn 0.2s ease; }
-        .modal-content { background: var(--bg-color); border: 1px solid var(--glass-border); padding: 25px; border-radius: 16px; width: 90%; max-width: 400px; display: flex; flex-direction: column; gap: 15px;}
-        .modal-header { font-size: 1.2rem; font-weight: 600; display: flex; justify-content: space-between; }
-        
-        .theme-grid { display: flex; gap: 10px; }
-        .theme-circle { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
-        .theme-circle:hover { transform: scale(1.1); }
-        
-        /* Edit textarea */
-        .edit-tarea { width: 100%; min-height: 100px; background: rgba(0,0,0,0.3); border: 1px solid var(--accent-color); color: white; padding: 10px; border-radius: 8px; outline: none; font-family: monospace; resize: vertical; }
-
-        @media (max-width: 800px) {
-            .kanban-board { flex-direction: column; }
-            .pomodoro-widget { bottom: 20px; right: 20px; transform: scale(0.8); transform-origin: bottom right; }
-        }
     </style>
 </head>
 <body>
 
-    <div class="app-container" id="app">
+    <!-- 🌟 Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="brand"><i class="fa-solid fa-infinity"></i> TaskFlow OS</div>
         
-        <!-- Gamification & Top Bar -->
-        <div class="top-bar">
-            <div class="xp-widget">
-                <div class="xp-level"><i class="fa-solid fa-star"></i> <span id="lvlText">Lvl 1</span></div>
-                <div class="xp-bar-container" title="Опыт">
-                    <div class="xp-bar" id="xpBar"></div>
-                </div>
-                <span style="font-size:0.8rem; color:var(--text-muted);" id="xpCurrentText">0 / 100</span>
+        <div class="user-widget" id="userWidget" onclick="switchView('dashboard')">
+            <div class="user-top">
+                <span id="uiLvl">Level 1</span>
+                <div class="fire"><i class="fa-solid fa-fire"></i> <span id="uiStreak">0</span></div>
             </div>
-            
-            <div class="app-tools">
-                <button class="btn-small" onclick="toggleView()"><i class="fa-solid fa-columns"></i> <span id="viewLbl">Канбан</span></button>
-                <button class="btn-small" onclick="document.getElementById('settingsModal').classList.add('active')"><i class="fa-solid fa-sliders"></i> Настройки</button>
-                <button class="btn-small" onclick="exportData()"><i class="fa-solid fa-download"></i></button>
-                <label class="btn-small" style="cursor:pointer; margin:0;"><i class="fa-solid fa-upload"></i><input type="file" id="importInput" style="display:none;" accept=".json"></label>
-            </div>
+            <div class="xp-bar-container"><div class="xp-bar" id="uiXpBar"></div></div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);" id="uiXpText">0 / 100 XP</div>
         </div>
 
-        <!-- Header -->
-        <div class="header">
-            <div class="title-block">
-                <h1>TaskFlow Elite</h1>
-            </div>
-            <div class="header-actions">
-                <input type="text" id="searchInput" class="search-input" placeholder="Поиск задач...">
-            </div>
+        <div class="nav-section">
+            <div class="nav-title">Приложения</div>
+            <a class="nav-item active" data-target="board" onclick="switchView('board')"><i class="fa-solid fa-layer-group"></i> Задачи</a>
+            <a class="nav-item" data-target="calendar" onclick="switchView('calendar')"><i class="fa-regular fa-calendar-days"></i> Календарь</a>
+            <a class="nav-item" data-target="dashboard" onclick="switchView('dashboard')"><i class="fa-solid fa-chart-pie"></i> Аналитика</a>
         </div>
 
-        <!-- Add Task -->
-        <div style="display:flex; flex-direction: column;">
-            <div class="add-task-wrapper">
-                <input type="text" id="addInput" class="task-input" placeholder="Добавить задачу. Подзадачи ('- [ ] text') в режиме редактирования">
-                <button class="meta-btn" onclick="document.getElementById('optionsRow').classList.toggle('active')"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                <button class="btn-add" onclick="addTask()"><i class="fa-solid fa-plus"></i> Создать</button>
+        <div class="nav-section" style="flex-grow:1;">
+            <div class="nav-title">Workspaces</div>
+            <div id="wsList">
+                <!-- Dynamically generated Workspaces -->
             </div>
-            <div class="task-options-row" id="optionsRow">
-                <select id="addPriority" class="meta-input">
-                    <option value="low">Low Priority</option>
-                    <option value="medium" selected>Medium Priority</option>
-                    <option value="high">High Priority</option>
-                </select>
-                <input type="date" id="addDate" class="meta-input">
-                <input type="text" id="addTags" class="meta-input" style="flex-grow:1;" placeholder="Теги через запятую">
-            </div>
+            <button class="nav-item" style="background:transparent; border:1px dashed var(--glass-border); width: 100%; margin-top:10px; justify-content:center;" onclick="addWorkspace()">
+                <i class="fa-solid fa-plus"></i> Создать
+            </button>
         </div>
 
-        <!-- Views Container -->
-        <div class="view-container" id="viewContainer">
-            
-            <!-- List View -->
-            <div class="list-board" id="listBoard"></div>
+        <button class="btn-install" id="btnInstallPwa">
+            <i class="fa-solid fa-download"></i> Установить App
+        </button>
+    </aside>
 
-            <!-- Kanban View -->
-            <div class="kanban-board">
-                <div class="kanban-column" data-status="todo" ondragover="allowDrop(event)" ondrop="drop(event, 'todo')">
-                    <div class="kanban-header">To Do</div>
-                    <div class="kanban-dropzone" id="k-todo" style="flex-grow:1; display:flex; flex-direction:column; gap:10px;"></div>
+    <!-- 🌟 Main Layout -->
+    <main class="main-content">
+        
+        <!-- ================= VIEW: BOARD (Tasks) ================= -->
+        <section id="view-board" class="view active">
+            <div class="view-header">
+                <div>
+                    <h2 id="currentWsTitle">Global Workspace</h2>
+                    <p style="color:var(--text-muted); margin-top:5px;">Управление задачами и идеями</p>
                 </div>
-                <div class="kanban-column" data-status="in_progress" ondragover="allowDrop(event)" ondrop="drop(event, 'in_progress')">
-                    <div class="kanban-header">In Progress</div>
-                    <div class="kanban-dropzone" id="k-ip" style="flex-grow:1; display:flex; flex-direction:column; gap:10px;"></div>
-                </div>
-                <div class="kanban-column" data-status="done" ondragover="allowDrop(event)" ondrop="drop(event, 'done')">
-                    <div class="kanban-header">Done</div>
-                    <div class="kanban-dropzone" id="k-done" style="flex-grow:1; display:flex; flex-direction:column; gap:10px;"></div>
+                <div class="view-controls">
+                    <button class="btn-icon" onclick="toggleBoardMode()" title="Сменить вид (Список/Канбан)"><i class="fa-solid fa-arrows-left-right-to-line"></i></button>
                 </div>
             </div>
-            
-        </div>
 
-    </div>
-
-    <!-- Pomodoro Widget -->
-    <div class="pomodoro-widget" id="pomodoro">
-        <div class="pomo-header"><i class="fa-solid fa-brain"></i> ФОКУС</div>
-        <div class="pomo-time" id="pomoTime">25:00</div>
-        <div class="pomo-controls">
-            <button class="pomo-btn" onclick="togglePomodoro()"><i class="fa-solid fa-play" id="pomoPlayIcon"></i></button>
-            <button class="pomo-btn" onclick="resetPomodoro()"><i class="fa-solid fa-rotate-right"></i></button>
-        </div>
-    </div>
-
-
-    <!-- Settings Modal -->
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <div class="modal-header">Настройки Ultimate <i class="fa-solid fa-xmark" style="cursor:pointer; color:gray;" onclick="document.getElementById('settingsModal').classList.remove('active')"></i></div>
-            
-            <label style="font-size:0.85rem; color:gray; margin-bottom:-10px;">Тема (Акцент)</label>
-            <div class="theme-grid">
-                <div class="theme-circle" style="background:#8A2BE2;" onclick="setTheme('#8A2BE2', '138,43,226')"></div>
-                <div class="theme-circle" style="background:#00E676;" onclick="setTheme('#00E676', '0,230,118')"></div>
-                <div class="theme-circle" style="background:#FF2A6D;" onclick="setTheme('#FF2A6D', '255,42,109')"></div>
-                <div class="theme-circle" style="background:#FF9900;" onclick="setTheme('#FF9900', '255,153,0')"></div>
-                <div class="theme-circle" style="background:#00D2FF;" onclick="setTheme('#00D2FF', '0,210,255')"></div>
+            <!-- Add Task form -->
+            <div class="task-input-wrapper">
+                <div class="task-input-row">
+                    <input type="text" id="inpTaskLabel" placeholder="Что нужно сделать? Нажмите Enter..." onkeypress="if(event.key==='Enter') saveNewTask()">
+                    <button class="btn-primary" onclick="saveNewTask()"><i class="fa-solid fa-bolt"></i></button>
+                </div>
+                <div class="task-meta-row">
+                    <select class="meta-input" id="inpTaskPrio">
+                         <option value="low">Низкий</option><option value="medium" selected>Средний</option><option value="high">Высокий</option>
+                    </select>
+                    <input type="date" class="meta-input" id="inpTaskDate" title="Дедлайн">
+                </div>
             </div>
 
-            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:10px 0;">
+            <!-- Board Area -->
+            <div class="board-container mode-kanban" id="boardArea">
+                <div class="board-col" ondragover="allowDrop(event)" ondrop="dropTask(event, 'todo')">
+                    <div class="board-col-header"><span>To Do</span> <span class="badge" id="c-todo">0</span></div>
+                    <div class="dropzone" id="col-todo"></div>
+                </div>
+                <div class="board-col" ondragover="allowDrop(event)" ondrop="dropTask(event, 'in_progress')">
+                    <div class="board-col-header"><span>In Progress</span> <span class="badge" id="c-ip">0</span></div>
+                    <div class="dropzone" id="col-in_progress"></div>
+                </div>
+                <div class="board-col" ondragover="allowDrop(event)" ondrop="dropTask(event, 'done')">
+                    <div class="board-col-header"><span>Done</span> <span class="badge" id="c-done">0</span></div>
+                    <div class="dropzone" id="col-done"></div>
+                </div>
+            </div>
+        </section>
 
-            <label style="font-size:0.85rem; color:gray; margin-bottom:-10px;">Telegram Напоминания (Уведомления о дедлайнах)</label>
-            <p style="font-size:0.75rem; color:#aaa; line-height:1.3; margin:0;">Бот будет присылать напоминания о задачах на сегодня. Узнайте свой Chat ID через @userinfobot.</p>
-            <input type="password" id="tgToken" placeholder="Bot Token..." class="meta-input" style="width:100%;">
-            <input type="text" id="tgChatId" placeholder="Ваш Chat ID..." class="meta-input" style="width:100%; margin-top:5px;">
-            
-            <button class="btn-add" onclick="saveSettings()" style="width:100%; margin-top:10px;">Сохранить параметры</button>
+        <!-- ================= VIEW: CALENDAR ================= -->
+        <section id="view-calendar" class="view">
+            <div class="view-header"><h2>Календарь дедлайнов</h2></div>
+            <div class="calendar-wrap">
+                <div class="cal-header">
+                    <button class="btn-icon" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h3 id="calMonthTitle">Сентябрь 2023</h3>
+                    <button class="btn-icon" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <!-- DOW headers -->
+                <div class="cal-grid" style="margin-bottom: 10px;">
+                    <div class="cal-day-name">Пн</div><div class="cal-day-name">Вт</div><div class="cal-day-name">Ср</div>
+                    <div class="cal-day-name">Чт</div><div class="cal-day-name">Пт</div><div class="cal-day-name">Сб</div><div class="cal-day-name">Вс</div>
+                </div>
+                <!-- Cells -->
+                <div class="cal-grid" id="calGrid"></div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: DASHBOARD ================= -->
+        <section id="view-dashboard" class="view">
+            <div class="view-header">
+                <div><h2>Ваша Аналитика</h2><p style="color:var(--text-muted);">Статистика продуктивности</p></div>
+            </div>
+            <div class="dash-grid">
+                
+                <div class="dash-card">
+                    <h3>Задач выполнено</h3>
+                    <div class="chart-container" id="chartTasks">
+                        <!-- SVG Donut Chart Gen -->
+                    </div>
+                    <div style="margin-top:20px; font-weight:600;"><span style="color:var(--success-color);" id="stDone">0</span> / <span id="stTotal">0</span> всего</div>
+                </div>
+
+                <div class="dash-card">
+                    <h3>Фокус & XP</h3>
+                    <div class="stat-huge" id="stXp">0</div>
+                    <p style="color:var(--text-muted); margin-bottom: 20px;">Очков продуктивности (XP)</p>
+                    
+                    <div style="width:100%; display:flex; justify-content:space-between; border-top:1px solid var(--glass-border); padding-top:15px;">
+                        <span><i class="fa-regular fa-clock" style="color:var(--accent-color);"></i> Помодоро:</span>
+                        <strong id="stPomoCount">0 сессий</strong>
+                    </div>
+                    <div style="width:100%; display:flex; justify-content:space-between; margin-top:5px;">
+                        <span><i class="fa-solid fa-fire" style="color:#f59e0b;"></i> Стрик дней:</span>
+                        <strong id="stStreakVal">0 дней 🔥</strong>
+                    </div>
+                </div>
+
+                <!-- Achievements panel -->
+                <div class="dash-card" style="grid-column: 1 / -1; align-items:flex-start;">
+                    <h3>Зал славы (Ачивки)</h3>
+                    <div style="display:flex; gap:15px; flex-wrap:wrap; width:100%;" id="achievementsGrid">
+                        <!-- Gen via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <!-- 🍅 Floating Pomodoro -->
+    <div class="floating-pomodoro">
+        <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-stopwatch"></i> Focus Mode</div>
+        <div class="pomo-time" id="fPomoTime">25:00</div>
+        <div class="pomo-btn-wrap">
+            <button class="btn-icon" onclick="pomoToggle()"><i class="fa-solid fa-play" id="fPomoIcon"></i></button>
+            <button class="btn-icon" onclick="pomoReset()"><i class="fa-solid fa-rotate-left"></i></button>
         </div>
     </div>
 
-    <!-- Edit Task Modal -->
-    <div class="modal" id="editModal">
-        <div class="modal-content" style="max-width:500px;">
-            <div class="modal-header">Редактирование <i class="fa-solid fa-xmark" style="cursor:pointer; color:gray;" onclick="document.getElementById('editModal').classList.remove('active')"></i></div>
-            <textarea id="editRawText" class="edit-tarea"></textarea>
-            <p style="font-size:0.75rem; color:gray; margin-top:-5px;">Используйте <code>- [ ] текст</code> для создания подзадач.</p>
-            <input type="hidden" id="editTaskId">
-            <button class="btn-add" onclick="saveTaskEdit()" style="width:100%;">Сохранить</button>
-        </div>
-    </div>
+    <!-- Toasts Container -->
+    <div class="toast-container" id="tContainer"></div>
 
-
+    <!-- PWA Magic Script Generation (Inline Base64 Data URI creation) -->
     <script>
-        // --- State ---
-        let tasks = JSON.parse(localStorage.getItem('tasks_v3')) || [];
-        let config = JSON.parse(localStorage.getItem('config_v3')) || { 
-            themeColor: '#8A2BE2', themeRgb: '138,43,226', view: 'list', tgToken: '', tgChatId: '', 
-            xp: 0, level: 1 
+        // --- 1. CORE STATE & DB ---
+        const DB_KEY = 'TF_OS_DB';
+        const defaultState = {
+            version: '4.0',
+            settings: { theme: '#8A2BE2', themeRgb: '138,43,226' },
+            user: { xp: 0, level: 1, streakCount: 0, lastLoginDate: '', pomoCompleted: 0, achieved: [] },
+            workspaces: [
+                { id: 'ws_default', name: 'Личное', icon: '🏠', color: '#3b82f6' },
+                { id: 'ws_work', name: 'Работа', icon: '💼', color: '#ef4444' }
+            ],
+            activeWs: 'ws_default',
+            tasks: [] // {id, wsId, title, st, prio, date}
         };
 
-        // DOM elements
-        const app = document.getElementById('viewContainer');
-        const listBoard = document.getElementById('listBoard');
-        const searchInp = document.getElementById('searchInput');
+        const achivementsList = [
+            { id: 'a_first', icon: '👶', title: 'Первая кровь', desc: 'Добавил первую задачу', req: state => state.tasks.length > 0 },
+            { id: 'a_done5', icon: '🏃', title: 'Марафонец', desc: 'Закрыл 5 задач', req: state => state.tasks.filter(t=>t.st==='done').length >= 5 },
+            { id: 'a_pomo3', icon: '🍅', title: 'Томатный лорд', desc: 'Сделал 3 фокус-сессии', req: state => state.user.pomoCompleted >= 3 },
+            { id: 'a_streak3', icon: '🔥', title: 'В ударе', desc: 'Поддерживал стрик 3 дня', req: state => state.user.streakCount >= 3 }
+        ];
 
-        // Sounds via Web Audio API
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSfx(type) {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
+        let db = JSON.parse(localStorage.getItem(DB_KEY));
+        if(!db || !db.version) { db = JSON.parse(JSON.stringify(defaultState)); }
+        
+        function saveDB() {
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            checkAchievements();
+            renderUserStats();
+        }
+
+        // SFX 
+        const auCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function sfx(type) {
+            if(auCtx.state==='suspended') auCtx.resume();
+            const o = auCtx.createOscillator(), g = auCtx.createGain();
+            o.connect(g); g.connect(auCtx.destination);
+            const n = auCtx.currentTime;
+            if(type==='pop'){ o.type='sine'; o.frequency.setValueAtTime(600,n); o.frequency.exponentialRampToValueAtTime(1200,n+0.1); g.gain.setValueAtTime(0.5,n); g.gain.exponentialRampToValueAtTime(0.01,n+0.1); o.start(n); o.stop(n+0.1); }
+            if(type==='fanfare'){ o.type='square'; o.frequency.setValueAtTime(400,n); o.frequency.setValueAtTime(600,n+0.2); o.frequency.setValueAtTime(800,n+0.4); g.gain.setValueAtTime(0.3,n); g.gain.linearRampToValueAtTime(0,n+0.7); o.start(n); o.stop(n+0.7);}
+        }
+
+        // --- 2. ROUTING & UI RENDER ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item[data-target]').forEach(n => n.classList.remove('active'));
             
-            const now = audioCtx.currentTime;
-            if(type === 'pop') { osc.type='sine'; osc.frequency.setValueAtTime(500, now); osc.frequency.exponentialRampToValueAtTime(1000, now+0.1); gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.1); osc.start(now); osc.stop(now+0.1); }
-            if(type === 'ding'){ osc.type='triangle'; osc.frequency.setValueAtTime(800, now); osc.frequency.setValueAtTime(1200, now+0.1); gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.4); osc.start(now); osc.stop(now+0.4); }
-            if(type === 'lvlup'){ osc.type='square'; osc.frequency.setValueAtTime(400,now); osc.frequency.linearRampToValueAtTime(800,now+0.3); osc.frequency.linearRampToValueAtTime(1200,now+0.6); gain.gain.setValueAtTime(0.3,now); gain.gain.linearRampToValueAtTime(0,now+0.6); osc.start(now); osc.stop(now+0.6); }
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            let nav = document.querySelector(`.nav-item[data-target="${viewId}"]`);
+            if(nav) nav.classList.add('active');
+
+            if(viewId === 'board') renderBoard();
+            if(viewId === 'calendar') renderCalendar();
+            if(viewId === 'dashboard') renderDashboard();
         }
 
-        // --- Gamification ---
-        function addXP(amount) {
-            config.xp += amount;
-            const threshold = config.level * 100;
-            if (config.xp >= threshold) {
-                config.level++;
-                config.xp -= threshold;
-                playSfx('lvlup');
-                showConfetti();
-            }
-            saveConfig();
-            renderTopBar();
-        }
-
-        function renderTopBar() {
-            document.getElementById('lvlText').innerText = `Lvl ${config.level}`;
-            const threshold = config.level * 100;
-            document.getElementById('xpCurrentText').innerText = `${config.xp} / ${threshold}`;
-            document.getElementById('xpBar').style.width = `${(config.xp / threshold)*100}%`;
-            
-            // Theme apply
-            document.documentElement.style.setProperty('--accent-color', config.themeColor);
-            document.documentElement.style.setProperty('--accent-color-rgb', config.themeRgb);
-            
-            // View apply
-            document.getElementById('viewContainer').className = `view-container view-${config.view}`;
-            document.getElementById('viewLbl').innerText = config.view === 'list' ? 'Канбан' : 'Список';
-        }
-
-        function showConfetti() {
-            // Very simple visual effect for level up
-            const body = document.body;
-            for(let i=0; i<30; i++) {
-                let div = document.createElement('div');
-                div.style.position = 'fixed';
-                div.style.left = Math.random()*100 + 'vw';
-                div.style.top = '-10px';
-                div.style.width = '10px'; div.style.height = '10px';
-                div.style.backgroundColor = ['#ff0', '#f0f', '#0ff', '#0f0'][Math.floor(Math.random()*4)];
-                div.style.zIndex = 9999;
-                div.style.transition = 'top 2s linear, transform 2s ease';
-                body.appendChild(div);
-                setTimeout(()=> { div.style.top = '110vh'; div.style.transform = `rotate(${Math.random()*360}deg)`; }, 50);
-                setTimeout(()=> div.remove(), 2000);
-            }
-        }
-
-        // --- Core ---
-        function init() {
-            renderTopBar();
-            document.getElementById('tgToken').value = config.tgToken || '';
-            document.getElementById('tgChatId').value = config.tgChatId || '';
-            renderTasks();
-            startReminderSystem();
-        }
-
-        function saveParams() {
-            localStorage.setItem('tasks_v3', JSON.stringify(tasks));
-        }
-        function saveConfig() {
-            localStorage.setItem('config_v3', JSON.stringify(config));
-        }
-
-        // Task parsing
-        function parseText(raw) {
-            let pureText = [];
-            let subtasks = [];
-            let lines = raw.split('\n');
-            lines.forEach((l, i) => {
-                let m = l.match(/^- \[([ xX])\] (.*)/);
-                if (m) {
-                    subtasks.push({ id: `st_${Date.now()}_${i}`, text: m[2], done: m[1].toLowerCase()==='x' });
-                } else {
-                    pureText.push(l);
-                }
+        function renderWorkspaces() {
+            const list = document.getElementById('wsList');
+            list.innerHTML = '';
+            db.workspaces.forEach(ws => {
+                const isActive = ws.id === db.activeWs;
+                list.innerHTML += `
+                    <div class="nav-item ${isActive?'active':''}" style="padding-left:20px;" onclick="selectWs('${ws.id}')">
+                        <span class="workspace-badge" style="background:${ws.color};"></span>
+                        ${ws.icon} ${ws.name}
+                    </div>
+                `;
             });
-            
-            // Markdown bold/italic
-            let htmlText = escapeHTML(pureText.join('\n'));
-            htmlText = htmlText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            htmlText = htmlText.replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.1);padding:2px;border-radius:4px;">$1</code>');
-            
-            return { htmlText, subtasks };
         }
 
-        function escapeHTML(str) { return str.replace(/[&<>'"]/g, t =>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t));}
+        function selectWs(id) {
+            db.activeWs = id;
+            saveDB();
+            renderWorkspaces();
+            switchView('board');
+        }
 
-        function renderTasks() {
-            const query = searchInp.value.toLowerCase();
-            const filtered = tasks.filter(t => t.raw.toLowerCase().includes(query) || (t.tags && t.tags.join(' ').toLowerCase().includes(query)));
+        function addWorkspace() {
+            let n = prompt("Название нового Workspace:");
+            if(!n) return;
+            const colors = ['#f43f5e', '#8b5cf6', '#d946ef', '#10b981', '#f59e0b', '#0ea5e9'];
+            db.workspaces.push({
+                id: 'ws_'+Date.now(), name: n, icon: '📁', color: colors[Math.floor(Math.random()*colors.length)]
+            });
+            saveDB(); renderWorkspaces();
+        }
 
-            // Reset containers
-            listBoard.innerHTML = '';
-            document.getElementById('k-todo').innerHTML = '';
-            document.getElementById('k-ip').innerHTML = '';
-            document.getElementById('k-done').innerHTML = '';
+        function renderUserStats() {
+            const u = db.user;
+            document.getElementById('uiLvl').innerText = `Level ${u.level}`;
+            document.getElementById('uiStreak').innerText = u.streakCount;
+            document.getElementById('uiXpText').innerText = `${u.xp} / ${u.level*100} XP`;
+            document.getElementById('uiXpBar').style.width = Math.min((u.xp / (u.level*100))*100, 100) + '%';
+        }
 
-            filtered.forEach(task => {
-                const { htmlText, subtasks } = parseText(task.raw);
-                const isDone = task.status === 'done';
+        function addXp(amount) {
+            db.user.xp += amount;
+            const req = db.user.level * 100;
+            if(db.user.xp >= req) {
+                db.user.level++;
+                db.user.xp -= req;
+                showToast('УРОВЕНЬ ПОВЫШЕН!', `Поздравляем с новым ${db.user.level} уровнем!`, '🆙');
+                sfx('fanfare');
+            }
+            saveDB();
+        }
 
-                let tagHtml = (task.tags||[]).map(t => `<span class="task-badge">#${escapeHTML(t)}</span>`).join('');
-                let dlHtml = task.deadline ? `<span class="task-badge"><i class="fa-solid fa-clock"></i> ${task.deadline}</span>` : '';
-                
-                let subHtml = '';
-                if(subtasks.length > 0) {
-                    let total = subtasks.length;
-                    let doneC = subtasks.filter(s=>s.done).length;
-                    subHtml = `<ul class="subtasks-list">
-                        ${subtasks.map((s, idx) => `
-                            <li class="subtask-item ${s.done?'done':''}" onclick="toggleSubtask('${task.id}', ${idx}, event)">
-                                <div class="subtask-box">${s.done?'✔':''}</div> <span>${escapeHTML(s.text)}</span>
-                            </li>
-                        `).join('')}
-                    </ul>`;
-                }
+        // --- 3. BOARD & TASKS LOGIC ---
+        let boardIsList = false;
+        function toggleBoardMode() {
+            boardIsList = !boardIsList;
+            document.getElementById('boardArea').className = boardIsList ? 'board-container mode-list' : 'board-container mode-kanban';
+        }
 
-                let elHtml = `
-                    <div class="task-item ${isDone?'status-done':''}" draggable="true" ondragstart="drag(event, '${task.id}')" data-id="${task.id}">
-                        <div class="task-head">
-                            <label class="checkbox-container" onclick="event.stopPropagation()">
-                                <input type="checkbox" onchange="toggleTask('${task.id}', this.checked)" ${isDone ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                            </label>
-                            <div class="task-text">${htmlText} ${subHtml}</div>
-                        </div>
-                        <div class="task-foot">
+        // Markdown Parser (Super Simple)
+        function pMd(t) {
+            return t.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                    .replace(/\*(.*?)\*/g, '<i>$1</i>')
+                    .replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.2);padding:2px 4px;border-radius:4px;">$1</code>')
+                    .replace(/~~(.*?)~~/g, '<del>$1</del>');
+        }
+
+        function renderBoard() {
+            const ws = db.workspaces.find(w => w.id === db.activeWs);
+            document.getElementById('currentWsTitle').innerHTML = `${ws.icon} ${ws.name}`;
+
+            const tTasks = db.tasks.filter(t => t.wsId === ws.id);
+            const cols = { todo: [], in_progress: [], done: [] };
+            tTasks.forEach(t => { if(cols[t.st]) cols[t.st].push(t); });
+
+            ['todo', 'in_progress', 'done'].forEach(col => {
+                document.getElementById(`c-${col==='in_progress'?'ip':col}`).innerText = cols[col].length;
+                const el = document.getElementById(`col-${col}`);
+                el.innerHTML = '';
+                cols[col].forEach(t => {
+                    const isD = t.st === 'done';
+                    el.innerHTML += `
+                        <div class="task-item ${isD?'done':''}" draggable="true" ondragstart="dragT(event, '${t.id}')">
+                            <div class="task-head">
+                                <label class="chk-container" onclick="event.stopPropagation()">
+                                    <input type="checkbox" onchange="toggleT('${t.id}')" ${isD?'checked':''}>
+                                    <div class="chk-mark"></div>
+                                </label>
+                                <div class="task-title">${pMd(t.title)}</div>
+                            </div>
                             <div class="task-badges">
-                                <div class="priority-dot p-${task.priority}"></div>
-                                ${tagHtml} ${dlHtml}
+                                <span class="dot p-${t.prio}"></span>
+                                ${t.date ? `<span class="badge"><i class="fa-solid fa-clock"></i> ${t.date}</span>` : ''}
                             </div>
                             <div class="task-actions">
-                                <button class="btn-action" title="Редактировать" onclick="openEdit('${task.id}')"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn-action del" title="Удалить" onclick="deleteTask('${task.id}')"><i class="fa-solid fa-trash"></i></button>
+                                <button class="act-btn del" onclick="delT('${t.id}')"><i class="fa-solid fa-trash"></i></button>
                             </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function saveNewTask() {
+            const lbl = document.getElementById('inpTaskLabel').value.trim();
+            if(!lbl) return;
+            const p = document.getElementById('inpTaskPrio').value;
+            const d = document.getElementById('inpTaskDate').value;
+            
+            db.tasks.unshift({
+                id: 't_'+Date.now(), wsId: db.activeWs, title: lbl, prio: p, date: d, st: 'todo'
+            });
+            document.getElementById('inpTaskLabel').value = '';
+            document.getElementById('inpTaskDate').value = '';
+            
+            sfx('pop'); addXp(5); renderBoard();
+        }
+
+        function toggleT(id) {
+            const t = db.tasks.find(x => x.id === id);
+            if(t) {
+                if(t.st !== 'done') { t.st = 'done'; addXp(15); sfx('pop'); }
+                else { t.st = 'todo'; }
+                saveDB(); renderBoard();
+            }
+        }
+        function delT(id) {
+            db.tasks = db.tasks.filter(x => x.id !== id);
+            saveDB(); renderBoard();
+        }
+
+        // Drag Drop Task
+        let dragId = null;
+        function dragT(e, id) { dragId = id; setTimeout(()=>e.target.classList.add('dragging'),0); }
+        function allowDrop(e) { e.preventDefault(); }
+        function dropTask(e, stat) {
+            e.preventDefault();
+            if(dragId) {
+                const t = db.tasks.find(x=>x.id === dragId);
+                if(t && t.st !== stat) {
+                    if(stat === 'done') addXp(15);
+                    t.st = stat; saveDB(); renderBoard();
+                }
+            }
+            dragId = null; document.querySelectorAll('.dragging').forEach(n=>n.classList.remove('dragging'));
+        }
+        document.addEventListener('dragend', ()=> { document.querySelectorAll('.dragging').forEach(n=>n.classList.remove('dragging')); });
+
+        // --- 4. CALENDAR LOGIC ---
+        let calDate = new Date();
+        function renderCalendar() {
+            const title = document.getElementById('calMonthTitle');
+            const grid = document.getElementById('calGrid');
+            
+            const monthStr = calDate.toLocaleString('ru', { month: 'long', year: 'numeric' });
+            title.innerText = monthStr.charAt(0).toUpperCase() + monthStr.slice(1);
+            grid.innerHTML = '';
+
+            const y = calDate.getFullYear(), m = calDate.getMonth();
+            const firstDay = new Date(y, m, 1).getDay();
+            const daysInMonth = new Date(y, m+1, 0).getDate();
+            
+            // Adjust JS Sunday(0) to Monday(1) indexing
+            let offset = firstDay === 0 ? 6 : firstDay - 1;
+
+            // Tasks mapping
+            const tMap = {};
+            db.tasks.forEach(t => {
+                if(t.date && t.st !== 'done') {
+                    if(!tMap[t.date]) tMap[t.date] = [];
+                    tMap[t.date].push(t);
+                }
+            });
+
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            for(let i=0; i<offset; i++) grid.innerHTML += `<div class="cal-cell disabled"></div>`;
+
+            for(let d=1; d<=daysInMonth; d++) {
+                let cellDate = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                let isToday = cellDate === todayStr;
+                
+                let tasksHtml = '';
+                if(tMap[cellDate]) {
+                    tMap[cellDate].forEach(t => {
+                        tasksHtml += `<div class="cal-task-dot" style="background:${getBadgeColor(t.wsId)}">${t.title}</div>`;
+                    });
+                }
+                
+                grid.innerHTML += `
+                    <div class="cal-cell ${isToday?'today':''}">
+                        <div class="cal-date-num">${d}</div>
+                        <div style="flex-grow:1; display:flex; flex-direction:column; gap:2px; overflow:hidden;">${tasksHtml}</div>
+                    </div>
+                `;
+            }
+        }
+        function changeMonth(d) { calDate.setMonth(calDate.getMonth() + d); renderCalendar(); }
+        function getBadgeColor(wsId) { const ws = db.workspaces.find(x=>x.id===wsId); return ws ? ws.color : 'var(--accent-color)'; }
+
+        // --- 5. DASHBOARD & ACHIEVEMENTS ---
+        function renderDashboard() {
+            const doneC = db.tasks.filter(t=>t.st==='done').length;
+            const total = db.tasks.length;
+            document.getElementById('stDone').innerText = doneC;
+            document.getElementById('stTotal').innerText = total;
+            document.getElementById('stXp').innerText = db.user.xp + (db.user.level-1)*100;
+            document.getElementById('stPomoCount').innerText = db.user.pomoCompleted + ' сессий';
+            document.getElementById('stStreakVal').innerText = db.user.streakCount + ' дней 🔥';
+
+            // SVG Donut Render
+            const svgC = document.getElementById('chartTasks');
+            let percent = total === 0 ? 0 : Math.round((doneC/total)*100);
+            let dashVal = (percent * 283) / 100; // 283 is circle circumference
+            
+            svgC.innerHTML = `
+                <svg viewBox="0 0 100 100" style="width:100%; height:100%; transform: rotate(-90deg);">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="10" />
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--accent-color)" stroke-width="10" 
+                            stroke-dasharray="${dashVal} 283" stroke-linecap="round" style="transition: stroke-dasharray 1s ease-out;"/>
+                </svg>
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.8rem; font-weight:bold;">${percent}%</div>
+            `;
+
+            // Achievements Render
+            const achGrid = document.getElementById('achievementsGrid');
+            achGrid.innerHTML = '';
+            achivementsList.forEach(a => {
+                const isUnlocked = db.user.achieved.includes(a.id);
+                achGrid.innerHTML += `
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid ${isUnlocked?'gold':'var(--glass-border)'}; opacity: ${isUnlocked?1:0.4}; border-radius: 12px; padding:15px; width: 100%; max-width:260px; display:flex; gap:15px; align-items:center;">
+                        <div style="font-size: 2.5rem; filter: ${isUnlocked?'none':'grayscale(100%)'};">${a.icon}</div>
+                        <div>
+                            <h4 style="margin:0; color:${isUnlocked?'gold':'white'};">${a.title}</h4>
+                            <p style="margin:5px 0 0 0; font-size:0.8rem; color:gray;">${a.desc}</p>
                         </div>
                     </div>
                 `;
-
-                if(config.view === 'list') {
-                    listBoard.insertAdjacentHTML('beforeend', elHtml);
-                } else {
-                    document.getElementById(task.status === 'todo' ? 'k-todo' : (task.status === 'in_progress' ? 'k-ip' : 'k-done')).insertAdjacentHTML('beforeend', elHtml);
-                }
             });
         }
 
-        searchInp.addEventListener('input', renderTasks);
-
-        // Actions
-        function addTask() {
-            const val = document.getElementById('addInput').value.trim();
-            if(!val) return;
-            
-            const prio = document.getElementById('addPriority').value;
-            const date = document.getElementById('addDate').value;
-            const tRaw = document.getElementById('addTags').value;
-            const tags = tRaw ? tRaw.split(',').map(x=>x.trim()).filter(Boolean) : [];
-
-            tasks.unshift({
-                id: 't_'+Date.now(),
-                raw: val,
-                priority: prio,
-                deadline: date,
-                tags: tags,
-                status: 'todo',
-                notified: false // Флаг для напоминания
-            });
-            
-            document.getElementById('addInput').value = '';
-            document.getElementById('addTags').value = '';
-            document.getElementById('optionsRow').classList.remove('active');
-            
-            playSfx('pop');
-            addXP(2); // small reward for planning
-            saveParams();
-            renderTasks();
-        }
-
-        function toggleTask(id, checked) {
-            let t = tasks.find(x => x.id === id);
-            if(t) {
-                if(checked && t.status !== 'done') {
-                    playSfx('ding');
-                    addXP(10); // Reward for completing
-                }
-                t.status = checked ? 'done' : 'todo';
-                saveParams();
-                renderTasks();
-            }
-        }
-
-        function toggleSubtask(tId, sIdx, e) {
-            e.stopPropagation();
-            let t = tasks.find(x => x.id === tId);
-            if(t) {
-                // Reconstruct raw string logic: this is tricky. We'll reconstruct raw by parsing it, modifying the ast, and merging back
-                let lines = t.raw.split('\n');
-                let subcount = 0;
-                for(let i=0; i<lines.length; i++) {
-                    let m = lines[i].match(/^- \[([ xX])\] (.*)/);
-                    if(m){
-                        if(subcount === sIdx) {
-                            let wasDone = m[1].toLowerCase() === 'x';
-                            lines[i] = `- [${wasDone?' ':'x'}] ${m[2]}`;
-                            if(!wasDone) { playSfx('pop'); addXP(3); } // 3 xp for subtask
-                            break;
-                        }
-                        subcount++;
+        function checkAchievements() {
+            achivementsList.forEach(a => {
+                if(!db.user.achieved.includes(a.id)) {
+                    if(a.req(db)) {
+                        db.user.achieved.push(a.id);
+                        showToast('Achievement Unlocked!', a.title, a.icon);
+                        addXp(100);
+                        sfx('fanfare');
                     }
                 }
-                t.raw = lines.join('\n');
-                saveParams();
-                renderTasks();
-            }
+            });
         }
 
-        function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            saveParams();
-            renderTasks();
+        // --- 6. FLOATING POMODORO ---
+        let pTime = 25 * 60, pInt = null, pRun = false;
+        function updatePomo() {
+            let m = Math.floor(pTime/60).toString().padStart(2,'0');
+            let s = (pTime%60).toString().padStart(2,'0');
+            document.getElementById('fPomoTime').innerText = `${m}:${s}`;
+            document.getElementById('fPomoIcon').className = pRun ? 'fa-solid fa-pause' : 'fa-solid fa-play';
         }
-
-        // Edit Modal
-        function openEdit(id) {
-            let t = tasks.find(x=>x.id === id);
-            document.getElementById('editTaskId').value = t.id;
-            document.getElementById('editRawText').value = t.raw;
-            document.getElementById('editModal').classList.add('active');
-        }
-        
-        function saveTaskEdit() {
-            let id = document.getElementById('editTaskId').value;
-            let val = document.getElementById('editRawText').value;
-            let t = tasks.find(x=>x.id === id);
-            if(t && val.trim()) {
-                t.raw = val.trim();
-                saveParams();
-                renderTasks();
-            }
-            document.getElementById('editModal').classList.remove('active');
-        }
-
-        // Drag & Drop
-        let draggedId = null;
-        function drag(e, id) {
-            draggedId = id;
-            setTimeout(()=> e.target.classList.add('dragging'), 0);
-        }
-        function allowDrop(e) {
-            e.preventDefault();
-        }
-        function drop(e, newStatus) {
-            e.preventDefault();
-            if(draggedId) {
-                let t = tasks.find(x=>x.id === draggedId);
-                if(t && t.status !== newStatus) {
-                    if(newStatus === 'done') { playSfx('ding'); addXP(10); } // Completed via drag
-                    t.status = newStatus;
-                    saveParams();
-                    renderTasks();
-                }
-            }
-            draggedId = null;
-            document.querySelectorAll('.dragging').forEach(el=>el.classList.remove('dragging'));
-        }
-        document.addEventListener('dragend', () => { draggedId=null; document.querySelectorAll('.dragging').forEach(el=>el.classList.remove('dragging')); });
-
-        // --- Toolbar ---
-        function toggleView() {
-            config.view = config.view === 'list' ? 'kanban' : 'list';
-            saveConfig();
-            renderTopBar();
-            renderTasks();
-        }
-
-        function setTheme(hex, rgb) {
-            config.themeColor = hex;
-            config.themeRgb = rgb;
-            saveConfig();
-            renderTopBar();
-        }
-
-        function saveSettings() {
-            config.tgToken = document.getElementById('tgToken').value.trim();
-            config.tgChatId = document.getElementById('tgChatId').value.trim();
-            saveConfig();
-            document.getElementById('settingsModal').classList.remove('active');
-            startReminderSystem();
-            if(config.tgToken && config.tgChatId) {
-                sendTelegramMsg("✅ Напоминания TaskFlow Elite успешно настроены!");
-            }
-        }
-
-        // Data Export/Import
-        function exportData() {
-            const dataStr = JSON.stringify({ tasks, config });
-            let blob = new Blob([dataStr], {type: "application/json"});
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url; a.download = 'taskflow-master-backup.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        document.getElementById('importInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    let d = JSON.parse(evt.target.result);
-                    if(d.tasks) tasks = d.tasks;
-                    if(d.config) config = d.config;
-                    saveParams(); saveConfig();
-                    init();
-                    alert('Данные успешно загружены!');
-                } catch(err) { alert('Ошибка формата файла!'); }
-            };
-            reader.readAsText(file);
-        });
-
-        // --- Pomodoro ---
-        let pomoTime = 25 * 60;
-        let pomoInterval = null;
-        let isPomoRunning = false;
-        
-        function formatTime(s) {
-            let m = Math.floor(s/60).toString().padStart(2,'0');
-            let sec = (s%60).toString().padStart(2,'0');
-            return `${m}:${sec}`;
-        }
-        function updatePomoUI() {
-            document.getElementById('pomoTime').innerText = formatTime(pomoTime);
-            document.getElementById('pomoPlayIcon').className = isPomoRunning ? "fa-solid fa-pause" : "fa-solid fa-play";
-        }
-        function togglePomodoro() {
-            if(isPomoRunning) {
-                clearInterval(pomoInterval);
-                isPomoRunning = false;
-            } else {
-                isPomoRunning = true;
-                pomoInterval = setInterval(()=> {
-                    if(pomoTime > 0) {
-                        pomoTime--;
-                        updatePomoUI();
-                    } else {
-                        clearInterval(pomoInterval);
-                        isPomoRunning = false;
-                        playSfx('ding');
-                        addXP(50); // Big reward for focus session
-                        alert("Pomodoro завершен! Отличная работа!");
-                        pomoTime = 5 * 60; // 5 min break
-                        updatePomoUI();
+        function pomoToggle() {
+            if(pRun) { clearInterval(pInt); pRun=false; updatePomo(); }
+            else {
+                pRun = true; updatePomo();
+                pInt = setInterval(()=>{
+                    if(pTime>0){ pTime--; updatePomo(); }
+                    else {
+                        clearInterval(pInt); pRun=false; 
+                        sfx('fanfare'); showToast("Time's Up!", "Фокус завершен. Отдыхаем!", "🍅");
+                        db.user.pomoCompleted++; saveDB(); addXp(50);
+                        pTime = 5 * 60; updatePomo(); // Break
                     }
                 }, 1000);
             }
-            updatePomoUI();
         }
-        function resetPomodoro() {
-            clearInterval(pomoInterval);
-            isPomoRunning = false;
-            pomoTime = 25 * 60;
-            updatePomoUI();
+        function pomoReset() { clearInterval(pInt); pRun=false; pTime=25*60; updatePomo(); }
+
+        // --- TOAST SYSTEM ---
+        function showToast(title, msg, icon) {
+            const c = document.getElementById('tContainer');
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.innerHTML = `<div class="toast-icon">${icon}</div><div class="toast-text"><h4>${title}</h4><p>${msg}</p></div>`;
+            c.appendChild(el);
+            setTimeout(() => { el.style.animation = 'fadeOut 0.5s ease forwards'; setTimeout(()=>el.remove(),500); }, 4000);
         }
 
-
-        // --- Reminders System (Push to Telegram) ---
-        let reminderTimer = null;
-
-        async function sendTelegramMsg(text) {
-            if(!config.tgToken || !config.tgChatId) return;
-            try {
-                await fetch(`https://api.telegram.org/bot${config.tgToken}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: config.tgChatId, text: text, parse_mode: 'Markdown' })
-                });
-            } catch(e) { console.log('TG Send error', e); }
-        }
-        
-        function checkReminders() {
-            if(!config.tgToken || !config.tgChatId) return;
-            
-            const todayStr = new Date().toISOString().split('T')[0];
-            let changed = false;
-
-            tasks.forEach(t => {
-                if(t.status !== 'done' && t.deadline === todayStr && !t.notified) {
-                    const pureText = t.raw.split('\n')[0].replace(/[-*`]/g, '').trim(); 
-                    sendTelegramMsg(`⏰ *Напоминание!*\nСегодня дедлайн по задаче:\n${pureText}`);
-                    t.notified = true;
-                    changed = true;
+        // --- STREAK CHECK (Login Daily) ---
+        function checkDailyStreak() {
+            const today = new Date().toISOString().split('T')[0];
+            if(db.user.lastLoginDate !== today) {
+                // Check if missed a day
+                let yest = new Date(); yest.setDate(yest.getDate()-1);
+                const yestStr = yest.toISOString().split('T')[0];
+                
+                if(db.user.lastLoginDate === yestStr) {
+                    db.user.streakCount++;
+                } else if(db.user.lastLoginDate !== '') {
+                    db.user.streakCount = 1; // reset broken streak
+                } else {
+                    db.user.streakCount = 1; // first time
                 }
-            });
-
-            if(changed) saveParams();
-        }
-
-        function startReminderSystem() {
-            if(reminderTimer) clearInterval(reminderTimer);
-            if(config.tgToken && config.tgChatId) {
-                reminderTimer = setInterval(checkReminders, 60000); // Check every minute
-                checkReminders(); 
+                db.user.lastLoginDate = today;
+                saveDB();
             }
         }
 
-        // Init
-        init();
+        // --- TELEGRAM REMINDERS PUSH ---
+        const TG_BOT = localStorage.getItem('TF_TG_BOT') || '';
+        const TG_CHAT = localStorage.getItem('TF_TG_CHAT') || '';
+        
+        setInterval(() => {
+            if(!TG_BOT || !TG_CHAT) return;
+            const now = new Date().toISOString().split('T')[0];
+            db.tasks.forEach(t => {
+                if(t.date === now && t.st !== 'done' && !t.reminded) {
+                    fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage`, {
+                        method: 'POST',
+                        headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify({
+                            chat_id: TG_CHAT, text: `⚠️ ДЕДЛАЙН СЕГОДНЯ!\n\nЗадача: ${t.title}\nВоркспейс: ${db.workspaces.find(w=>w.id===t.wsId)?.name}\nСрочно закрывай!`
+                        })
+                    }).then(r => { if(r.ok) { t.reminded = true; saveDB(); } });
+                }
+            });
+        }, 60000);
+
+        // --- INIT APP ---
+        document.addEventListener('DOMContentLoaded', () => {
+            checkDailyStreak();
+            renderWorkspaces();
+            renderUserStats();
+            switchView('board');
+        });
+
+        // ==========================================
+        // 🔮 PWA MAGIC: Virtual Service Worker & Manifest
+        // ==========================================
+        const manifestData = {
+            "name": "TaskFlow Elite OS",
+            "short_name": "TaskFlow OS",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#0b0f19",
+            "theme_color": "#8A2BE2",
+            "description": "Ultimate OS for Productivity",
+            "icons": [{
+                "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzhiNWNmNiIvPjxwYXRoIGQ9Ik0yNSA1MCBsMTUgMTUgbDM1IC0zNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIxMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+",
+                "sizes": "512x512", "type": "image/svg+xml"
+            }]
+        };
+
+        // Create Manifest Blob dynamically
+        let manBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/manifest+json'});
+        let manUrl = URL.createObjectURL(manBlob);
+        document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manUrl}">`);
+
+        // Create Service Worker Blob dynamically
+        const swCode = `
+            self.addEventListener('install', (e) => { self.skipWaiting(); });
+            self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(()=>new Response("Offline Mode"))); });
+        `;
+        let swBlob = new Blob([swCode], {type: 'application/javascript'});
+        let swUrl = URL.createObjectURL(swBlob);
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW setup failed: ', err));
+        }
+
+        // PWA Install Prompt Logic
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('btnInstallPwa').style.display = 'flex';
+        });
+
+        document.getElementById('btnInstallPwa').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') { document.getElementById('btnInstallPwa').style.display = 'none'; }
+                deferredPrompt = null;
+            }
+        });
 
     </script>
 </body>
