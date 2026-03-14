@@ -41,7 +41,7 @@
                 radial-gradient(circle at 85% 30%, rgba(0, 230, 118, 0.1) 0%, transparent 50%);
             background-size: cover; background-attachment: fixed;
             color: var(--text-main);
-            overflow: hidden; /* App feels like OS */
+            overflow: hidden;
             display: flex; height: 100vh; width: 100vw;
         }
 
@@ -52,6 +52,7 @@
             display: flex; flex-direction: column; padding: 20px; transition: transform 0.3s ease;
             z-index: 100;
         }
+        .sidebar.hidden { display: none; } /* Used for Welcome Lang screen */
 
         .main-content {
             flex-grow: 1; height: 100%; display: flex; flex-direction: column;
@@ -108,7 +109,14 @@
         .btn-icon { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; width: 42px; height: 42px; border-radius: var(--radius-md); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: var(--transition); }
         .btn-icon:hover { background: rgba(255,255,255,0.1); border-color: var(--text-muted); }
 
-        /* --- Task Board (List/Kanban mixed layout) --- */
+        /* Language View Grid */
+        .lang-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; width: 100%; max-width: 800px; margin: 0 auto; margin-top: 30px; }
+        .lang-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 25px; display: flex; flex-direction: column; align-items: center; gap: 15px; cursor: pointer; transition: var(--transition); }
+        .lang-card:hover { border-color: var(--accent-color); background: rgba(138,43,226,0.1); transform: translateY(-5px); box-shadow: var(--glass-shadow); }
+        .lang-flag { font-size: 3rem; }
+        .lang-name { font-weight: 600; font-size: 1.2rem; }
+
+        /* --- Task Board --- */
         .task-input-wrapper { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 15px; box-shadow: var(--glass-shadow); }
         .task-input-row { display: flex; gap: 15px; }
         .task-input-row input[type="text"] { flex-grow: 1; background: transparent; border: none; font-size: 1.1rem; color: white; outline: none;}
@@ -119,12 +127,10 @@
         .board-col-header { font-weight: 600; color: var(--text-muted); padding-bottom: 10px; display: flex; justify-content: space-between;}
         .dropzone { flex-grow: 1; min-height: 200px; display: flex; flex-direction: column; gap: 10px; }
         
-        /* List Mode Override */
         .mode-list .board-container { flex-direction: column; }
         .mode-list .board-col { width: 100%; min-width: auto; }
         .mode-list .dropzone { min-height: auto; }
 
-        /* Task Item */
         .task-item {
             background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: var(--radius-md);
             padding: 15px; display: flex; flex-direction: column; gap: 10px; transition: var(--transition); cursor: grab;
@@ -152,15 +158,14 @@
         .act-btn:hover { color: white; border-color: white; }
         .act-btn.del:hover { color: var(--danger-color); border-color: var(--danger-color); }
 
-        /* --- Dashboard (Charts) --- */
+        /* --- Dashboard --- */
         .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         .dash-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--glass-shadow); position: relative;}
         .dash-card h3 { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 20px; align-self: flex-start; }
         .stat-huge { font-size: 3rem; font-weight: 700; color: var(--accent-color); }
         .chart-container { width: 200px; height: 200px; position: relative; }
-        /* SVG Charts styling handles inline */
 
-        /* --- Calendar Grid --- */
+        /* --- Calendar --- */
         .calendar-wrap { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--glass-shadow); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .cal-header h3 { font-size: 1.5rem; }
@@ -173,7 +178,7 @@
         .cal-date-num { font-weight: 600; font-size: 1.1rem; }
         .cal-task-dot { background: var(--accent-color); color: white; font-size: 0.6rem; padding: 2px 4px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- Achievement Toast --- */
+        /* --- Achievements & Toasts --- */
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.2)); backdrop-filter: blur(10px); border: 1px solid gold; border-radius: var(--radius-md); padding: 15px 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 30px rgba(255,215,0,0.3); animation: slideInX 0.5s ease forwards; }
         .toast-icon { font-size: 2rem; }
@@ -182,22 +187,16 @@
         @keyframes slideInX { from { transform: translateX(120%); } to { transform: translateX(0); } }
         @keyframes fadeOut { to { opacity: 0; } }
 
-        /* --- Focus / Pomodoro Modal Widget --- */
+        /* --- Floating Pomodoro --- */
         .floating-pomodoro { position: fixed; bottom: 30px; right: 30px; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--glass-shadow); display: flex; flex-direction: column; align-items: center; z-index: 1000; transition: 0.3s; transform: scale(0.9); transform-origin: bottom right;}
+        .floating-pomodoro.hidden { display: none !important; }
         .floating-pomodoro:hover { transform: scale(1); }
         .pomo-time { font-size: 3rem; font-weight: bold; color: var(--accent-color); font-variant-numeric: tabular-nums; line-height: 1; margin: 10px 0;}
         .pomo-btn-wrap { display: flex; gap: 10px; }
 
-        /* Setup Modal */
-        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2000; display: none; justify-content: center; align-items: center;}
-        .modal-overlay.active { display: flex; }
-        .modal-box { background: var(--bg-color); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 30px; width: 90%; max-width: 450px; position: relative;}
-        .btn-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: gray; font-size: 1.5rem; cursor: pointer; }
-
-        /* Responsive */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; min-height: 60px; padding: 10px 20px; flex-direction: row; align-items: center; justify-content: space-between; overflow-x: auto; background: var(--bg-color); border-right: none; border-bottom: 1px solid var(--glass-border); z-index: 900;}
+            .sidebar { width: 100%; height: auto; min-height: 60px; padding: 10px 20px; flex-direction: row; align-items: center; justify-content: space-between; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--glass-border); z-index: 900;}
             .brand { margin: 0; font-size: 1.2rem; }
             .user-widget { display: none; }
             .nav-section { display: flex; margin: 0; padding: 0; gap: 10px; }
@@ -208,16 +207,15 @@
             .cal-cell { padding: 5px; }
             .cal-date-num { font-size: 0.9rem; }
         }
-
     </style>
 </head>
 <body>
 
     <!-- 🌟 Sidebar Navigation -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="appSidebar">
         <div class="brand"><i class="fa-solid fa-infinity"></i> TaskFlow OS</div>
         
-        <div class="user-widget" id="userWidget" onclick="switchView('dashboard')">
+        <div class="user-widget" onclick="switchView('dashboard')">
             <div class="user-top">
                 <span id="uiLvl">Level 1</span>
                 <div class="fire"><i class="fa-solid fa-fire"></i> <span id="uiStreak">0</span></div>
@@ -227,68 +225,95 @@
         </div>
 
         <div class="nav-section">
-            <div class="nav-title">Приложения</div>
-            <a class="nav-item active" data-target="board" onclick="switchView('board')"><i class="fa-solid fa-layer-group"></i> Задачи</a>
-            <a class="nav-item" data-target="calendar" onclick="switchView('calendar')"><i class="fa-regular fa-calendar-days"></i> Календарь</a>
-            <a class="nav-item" data-target="dashboard" onclick="switchView('dashboard')"><i class="fa-solid fa-chart-pie"></i> Аналитика</a>
+            <div class="nav-title" data-i18n="app_title">Приложения</div>
+            <a class="nav-item active" data-target="board" onclick="switchView('board')"><i class="fa-solid fa-layer-group"></i> <span data-i18n="nav_tasks">Задачи</span></a>
+            <a class="nav-item" data-target="calendar" onclick="switchView('calendar')"><i class="fa-regular fa-calendar-days"></i> <span data-i18n="nav_calendar">Календарь</span></a>
+            <a class="nav-item" data-target="dashboard" onclick="switchView('dashboard')"><i class="fa-solid fa-chart-pie"></i> <span data-i18n="nav_dashboard">Аналитика</span></a>
         </div>
 
         <div class="nav-section" style="flex-grow:1;">
-            <div class="nav-title">Workspaces</div>
+            <div class="nav-title" data-i18n="ws_title">Workspaces</div>
             <div id="wsList">
                 <!-- Dynamically generated Workspaces -->
             </div>
             <button class="nav-item" style="background:transparent; border:1px dashed var(--glass-border); width: 100%; margin-top:10px; justify-content:center;" onclick="addWorkspace()">
-                <i class="fa-solid fa-plus"></i> Создать
+                <i class="fa-solid fa-plus"></i> <span data-i18n="ws_create">Создать</span>
             </button>
         </div>
+        
+        <!-- Settings -> goes to language screen -->
+        <a class="nav-item" data-target="language" onclick="switchView('language')" style="margin-bottom: 15px;">
+            <i class="fa-solid fa-gear"></i> <span data-i18n="nav_settings">Настройки</span>
+        </a>
 
         <button class="btn-install" id="btnInstallPwa">
-            <i class="fa-solid fa-download"></i> Установить App
+            <i class="fa-solid fa-download"></i> <span data-i18n="btn_install">Установить App</span>
         </button>
     </aside>
 
     <!-- 🌟 Main Layout -->
     <main class="main-content">
         
+        <!-- ================= VIEW: LANGUAGE SELECTION ================= -->
+        <section id="view-language" class="view">
+            <div style="text-align: center; margin-top: 50px;">
+                <i class="fa-solid fa-earth-americas" style="font-size: 4rem; color: var(--accent-color); margin-bottom: 20px;"></i>
+                <h2 data-i18n="lang_select" style="font-size: 2.5rem; margin-bottom: 10px;">Select Your Language</h2>
+                <p data-i18n="lang_desc" style="color: var(--text-muted);">Вы сможете изменить его позже в настройках</p>
+                
+                <div class="lang-grid">
+                    <div class="lang-card" onclick="setLang('ru')"><div class="lang-flag">🇷🇺</div><div class="lang-name">Русский</div></div>
+                    <div class="lang-card" onclick="setLang('en')"><div class="lang-flag">🇬🇧</div><div class="lang-name">English</div></div>
+                    <div class="lang-card" onclick="setLang('de')"><div class="lang-flag">🇩🇪</div><div class="lang-name">Deutsch</div></div>
+                    <div class="lang-card" onclick="setLang('fr')"><div class="lang-flag">🇫🇷</div><div class="lang-name">Français</div></div>
+                    <div class="lang-card" onclick="setLang('es')"><div class="lang-flag">🇪🇸</div><div class="lang-name">Español</div></div>
+                    <div class="lang-card" onclick="setLang('it')"><div class="lang-flag">🇮🇹</div><div class="lang-name">Italiano</div></div>
+                    <div class="lang-card" onclick="setLang('uk')"><div class="lang-flag">🇺🇦</div><div class="lang-name">Українська</div></div>
+                    <div class="lang-card" onclick="setLang('zh')"><div class="lang-flag">🇨🇳</div><div class="lang-name">中文</div></div>
+                </div>
+            </div>
+        </section>
+
         <!-- ================= VIEW: BOARD (Tasks) ================= -->
-        <section id="view-board" class="view active">
+        <section id="view-board" class="view">
             <div class="view-header">
                 <div>
                     <h2 id="currentWsTitle">Global Workspace</h2>
-                    <p style="color:var(--text-muted); margin-top:5px;">Управление задачами и идеями</p>
+                    <p data-i18n="board_desc" style="color:var(--text-muted); margin-top:5px;">Управление задачами и идеями</p>
                 </div>
                 <div class="view-controls">
-                    <button class="btn-icon" onclick="toggleBoardMode()" title="Сменить вид (Список/Канбан)"><i class="fa-solid fa-arrows-left-right-to-line"></i></button>
+                    <button class="btn-icon" onclick="toggleBoardMode()"><i class="fa-solid fa-arrows-left-right-to-line"></i></button>
                 </div>
             </div>
 
             <!-- Add Task form -->
             <div class="task-input-wrapper">
                 <div class="task-input-row">
-                    <input type="text" id="inpTaskLabel" placeholder="Что нужно сделать? Нажмите Enter..." onkeypress="if(event.key==='Enter') saveNewTask()">
+                    <input type="text" id="inpTaskLabel" data-i18n-placeholder="ph_task" placeholder="Что нужно сделать? Нажмите Enter..." onkeypress="if(event.key==='Enter') saveNewTask()">
                     <button class="btn-primary" onclick="saveNewTask()"><i class="fa-solid fa-bolt"></i></button>
                 </div>
                 <div class="task-meta-row">
                     <select class="meta-input" id="inpTaskPrio">
-                         <option value="low">Низкий</option><option value="medium" selected>Средний</option><option value="high">Высокий</option>
+                         <option value="low" data-i18n="prio_low">Низкий</option>
+                         <option value="medium" selected  data-i18n="prio_med">Средний</option>
+                         <option value="high" data-i18n="prio_high">Высокий</option>
                     </select>
-                    <input type="date" class="meta-input" id="inpTaskDate" title="Дедлайн">
+                    <input type="date" class="meta-input" id="inpTaskDate">
                 </div>
             </div>
 
             <!-- Board Area -->
             <div class="board-container mode-kanban" id="boardArea">
                 <div class="board-col" ondragover="allowDrop(event)" ondrop="dropTask(event, 'todo')">
-                    <div class="board-col-header"><span>To Do</span> <span class="badge" id="c-todo">0</span></div>
+                    <div class="board-col-header"><span data-i18n="col_todo">To Do</span> <span class="badge" id="c-todo">0</span></div>
                     <div class="dropzone" id="col-todo"></div>
                 </div>
                 <div class="board-col" ondragover="allowDrop(event)" ondrop="dropTask(event, 'in_progress')">
-                    <div class="board-col-header"><span>In Progress</span> <span class="badge" id="c-ip">0</span></div>
+                    <div class="board-col-header"><span data-i18n="col_ip">In Progress</span> <span class="badge" id="c-ip">0</span></div>
                     <div class="dropzone" id="col-in_progress"></div>
                 </div>
                 <div class="board-col" ondragover="allowDrop(event)" ondrop="dropTask(event, 'done')">
-                    <div class="board-col-header"><span>Done</span> <span class="badge" id="c-done">0</span></div>
+                    <div class="board-col-header"><span data-i18n="col_done">Done</span> <span class="badge" id="c-done">0</span></div>
                     <div class="dropzone" id="col-done"></div>
                 </div>
             </div>
@@ -296,17 +321,16 @@
 
         <!-- ================= VIEW: CALENDAR ================= -->
         <section id="view-calendar" class="view">
-            <div class="view-header"><h2>Календарь дедлайнов</h2></div>
+            <div class="view-header"><h2 data-i18n="cal_title">Календарь дедлайнов</h2></div>
             <div class="calendar-wrap">
                 <div class="cal-header">
                     <button class="btn-icon" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                    <h3 id="calMonthTitle">Сентябрь 2023</h3>
+                    <h3 id="calMonthTitle">Title</h3>
                     <button class="btn-icon" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
                 <!-- DOW headers -->
-                <div class="cal-grid" style="margin-bottom: 10px;">
-                    <div class="cal-day-name">Пн</div><div class="cal-day-name">Вт</div><div class="cal-day-name">Ср</div>
-                    <div class="cal-day-name">Чт</div><div class="cal-day-name">Пт</div><div class="cal-day-name">Сб</div><div class="cal-day-name">Вс</div>
+                <div class="cal-grid" style="margin-bottom: 10px;" id="calDaysRow">
+                    <!-- Gen dynamically for translations -->
                 </div>
                 <!-- Cells -->
                 <div class="cal-grid" id="calGrid"></div>
@@ -316,39 +340,35 @@
         <!-- ================= VIEW: DASHBOARD ================= -->
         <section id="view-dashboard" class="view">
             <div class="view-header">
-                <div><h2>Ваша Аналитика</h2><p style="color:var(--text-muted);">Статистика продуктивности</p></div>
+                <div><h2 data-i18n="dash_title">Ваша Аналитика</h2><p data-i18n="dash_desc" style="color:var(--text-muted);">Статистика продуктивности</p></div>
             </div>
             <div class="dash-grid">
                 
                 <div class="dash-card">
-                    <h3>Задач выполнено</h3>
-                    <div class="chart-container" id="chartTasks">
-                        <!-- SVG Donut Chart Gen -->
-                    </div>
-                    <div style="margin-top:20px; font-weight:600;"><span style="color:var(--success-color);" id="stDone">0</span> / <span id="stTotal">0</span> всего</div>
+                    <h3 data-i18n="stat_done">Задач выполнено</h3>
+                    <div class="chart-container" id="chartTasks"></div>
+                    <div style="margin-top:20px; font-weight:600;"><span style="color:var(--success-color);" id="stDone">0</span> / <span id="stTotal">0</span> <span data-i18n="stat_total">всего</span></div>
                 </div>
 
                 <div class="dash-card">
-                    <h3>Фокус & XP</h3>
+                    <h3 data-i18n="stat_focus">Фокус & XP</h3>
                     <div class="stat-huge" id="stXp">0</div>
-                    <p style="color:var(--text-muted); margin-bottom: 20px;">Очков продуктивности (XP)</p>
+                    <p data-i18n="stat_xp_desc" style="color:var(--text-muted); margin-bottom: 20px;">Очков продуктивности (XP)</p>
                     
                     <div style="width:100%; display:flex; justify-content:space-between; border-top:1px solid var(--glass-border); padding-top:15px;">
-                        <span><i class="fa-regular fa-clock" style="color:var(--accent-color);"></i> Помодоро:</span>
-                        <strong id="stPomoCount">0 сессий</strong>
+                        <span><i class="fa-regular fa-clock" style="color:var(--accent-color);"></i> <span data-i18n="stat_pomo">Помодоро:</span></span>
+                        <strong><span id="stPomoCount">0</span> <span data-i18n="stat_p_sessions">сессий</span></strong>
                     </div>
                     <div style="width:100%; display:flex; justify-content:space-between; margin-top:5px;">
-                        <span><i class="fa-solid fa-fire" style="color:#f59e0b;"></i> Стрик дней:</span>
-                        <strong id="stStreakVal">0 дней 🔥</strong>
+                        <span><i class="fa-solid fa-fire" style="color:#f59e0b;"></i> <span data-i18n="stat_streak">Стрик дней:</span></span>
+                        <strong><span id="stStreakVal">0</span> <span data-i18n="stat_s_days">дней</span> 🔥</strong>
                     </div>
                 </div>
 
                 <!-- Achievements panel -->
                 <div class="dash-card" style="grid-column: 1 / -1; align-items:flex-start;">
-                    <h3>Зал славы (Ачивки)</h3>
-                    <div style="display:flex; gap:15px; flex-wrap:wrap; width:100%;" id="achievementsGrid">
-                        <!-- Gen via JS -->
-                    </div>
+                    <h3 data-i18n="ach_title">Зал славы (Ачивки)</h3>
+                    <div style="display:flex; gap:15px; flex-wrap:wrap; width:100%;" id="achievementsGrid"></div>
                 </div>
             </div>
         </section>
@@ -356,8 +376,8 @@
     </main>
 
     <!-- 🍅 Floating Pomodoro -->
-    <div class="floating-pomodoro">
-        <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-stopwatch"></i> Focus Mode</div>
+    <div class="floating-pomodoro" id="appPomodoro">
+        <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-stopwatch"></i> <span data-i18n="pomo_mode">Focus Mode</span></div>
         <div class="pomo-time" id="fPomoTime">25:00</div>
         <div class="pomo-btn-wrap">
             <button class="btn-icon" onclick="pomoToggle()"><i class="fa-solid fa-play" id="fPomoIcon"></i></button>
@@ -368,36 +388,78 @@
     <!-- Toasts Container -->
     <div class="toast-container" id="tContainer"></div>
 
-    <!-- PWA Magic Script Generation (Inline Base64 Data URI creation) -->
     <script>
-        // --- 1. CORE STATE & DB ---
+        // ==========================================
+        // 🔮 LOGIC & TRANSLATIONS
+        // ==========================================
+        const i18n = {
+            ru: { app_title:"Приложения", nav_tasks:"Задачи", nav_calendar:"Календарь", nav_dashboard:"Аналитика", nav_settings:"Настройки", ws_title:"Workspaces", ws_create:"Создать", ws_personal:"Личное", ws_work:"Работа", btn_install:"Установить App", board_desc:"Управление задачами и идеями", ph_task:"Что нужно сделать? Нажмите Enter...", prio_low:"Низкий", prio_med:"Средний", prio_high:"Высокий", col_todo:"К выполнению", col_ip:"В процессе", col_done:"Готово", cal_title:"Календарь дедлайнов", dash_title:"Ваша Аналитика", dash_desc:"Статистика продуктивности", stat_done:"Задач выполнено", stat_total:"всего", stat_focus:"Фокус & XP", stat_xp_desc:"Очков (XP)", stat_pomo:"Помодоро:", stat_p_sessions:"сессий", stat_streak:"Стрик:", stat_s_days:"дней", ach_title:"Зал славы", ach1_t:"Первая кровь", ach1_d:"Добавлена первая задача", ach2_t:"Марафонец", ach2_d:"Закрыто 5 задач", ach3_t:"Томатный лорд", ach3_d:"3 фокус-сессии", ach4_t:"В ударе", ach4_d:"Стрик 3 дня", lvl_up:"УРОВЕНЬ ПОВЫШЕН!", lvl_up_msg:"Поздравляем с новым", toast_achive:"Достижение разблокировано!", pomo_mode:"Режим фокуса", pomo_end:"Отдыхаем!", lang_select:"Выберите свой язык", lang_desc:"Вы сможете изменить его позже в настройках", prompt_ws:"Название нового Workspace:", days: ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'] },
+            en: { app_title:"Applications", nav_tasks:"Tasks", nav_calendar:"Calendar", nav_dashboard:"Dashboard", nav_settings:"Settings", ws_title:"Workspaces", ws_create:"Create", ws_personal:"Personal", ws_work:"Work", btn_install:"Install App", board_desc:"Manage your tasks and ideas", ph_task:"What needs to be done? Press Enter...", prio_low:"Low", prio_med:"Medium", prio_high:"High", col_todo:"To Do", col_ip:"In Progress", col_done:"Done", cal_title:"Deadline Calendar", dash_title:"Your Analytics", dash_desc:"Productivity stats", stat_done:"Tasks Completed", stat_total:"total", stat_focus:"Focus & XP", stat_xp_desc:"Productivity Points", stat_pomo:"Pomodoros:", stat_p_sessions:"sessions", stat_streak:"Streak:", stat_s_days:"days", ach_title:"Hall of Fame", ach1_t:"First Blood", ach1_d:"Added first task", ach2_t:"Marathoner", ach2_d:"Completed 5 tasks", ach3_t:"Tomato Lord", ach3_d:"3 focus sessions", ach4_t:"On Fire", ach4_d:"3-day streak", lvl_up:"LEVEL UP!", lvl_up_msg:"Congratulations on hitting level", toast_achive:"Achievement Unlocked!", pomo_mode:"Focus Mode", pomo_end:"Take a break!", lang_select:"Select Your Language", lang_desc:"You can change this later in settings", prompt_ws:"New Workspace name:", days: ['Mo','Tu','We','Th','Fr','Sa','Su'] },
+            de: { app_title:"Anwendungen", nav_tasks:"Aufgaben", nav_calendar:"Kalender", nav_dashboard:"Dashboard", nav_settings:"Einstellungen", ws_title:"Arbeitsbereiche", ws_create:"Erstellen", ws_personal:"Persönlich", ws_work:"Arbeit", btn_install:"App installieren", board_desc:"Aufgaben verwalten", ph_task:"Was ist zu tun? Enter drücken...", prio_low:"Niedrig", prio_med:"Mittel", prio_high:"Hoch", col_todo:"Zu erledigen", col_ip:"In Bearbeitung", col_done:"Erledigt", cal_title:"Kalender", dash_title:"Ihre Analyse", dash_desc:"Statistik", stat_done:"Erledigt", stat_total:"gesamt", stat_focus:"Fokus & XP", stat_xp_desc:"Punkte (XP)", stat_pomo:"Pomodoros:", stat_p_sessions:"Sitzungen", stat_streak:"Serie:", stat_s_days:"Tage", ach_title:"Ruhmeshalle", ach1_t:"Erstes Blut", ach1_d:"Erste Aufgabe", ach2_t:"Marathonläufer", ach2_d:"5 Aufgaben erledigt", ach3_t:"Tomatenlord", ach3_d:"3 Sitzungen", ach4_t:"Im Rausch", ach4_d:"3-Tage-Streak", lvl_up:"STUFENAUFSTIEG!", lvl_up_msg:"Glückwunsch zu Stufe", toast_achive:"Erfolg freigeschaltet!", pomo_mode:"Fokus-Modus", pomo_end:"Pause machen!", lang_select:"Wählen Sie Ihre Sprache", lang_desc:"Später in den Einstellungen änderbar", prompt_ws:"Neuer Arbeitsbereich:", days: ['Mo','Di','Mi','Do','Fr','Sa','So'] },
+            fr: { app_title:"Applications", nav_tasks:"Tâches", nav_calendar:"Calendrier", nav_dashboard:"Tableau de bord", nav_settings:"Paramètres", ws_title:"Espaces", ws_create:"Créer", ws_personal:"Personnel", ws_work:"Travail", btn_install:"Installer l'App", board_desc:"Gérez vos tâches", ph_task:"Que faire ? Entrée...", prio_low:"Faible", prio_med:"Moyen", prio_high:"Haut", col_todo:"À faire", col_ip:"En cours", col_done:"Terminé", cal_title:"Calendrier", dash_title:"Analytiques", dash_desc:"Statistiques", stat_done:"Terminées", stat_total:"total", stat_focus:"Concentration & XP", stat_xp_desc:"Points (XP)", stat_pomo:"Pomodoros:", stat_p_sessions:"sessions", stat_streak:"Série:", stat_s_days:"jours", ach_title:"Temple de la renommée", ach1_t:"Premier Sang", ach1_d:"Première tâche", ach2_t:"Marathonien", ach2_d:"5 tâches accomplies", ach3_t:"Seigneur Tomate", ach3_d:"3 sessions", ach4_t:"En feu", ach4_d:"Série de 3 jours", lvl_up:"NIVEAU SUPÉRIEUR!", lvl_up_msg:"Félicitations pour le niveau", toast_achive:"Succès déverrouillé!", pomo_mode:"Concentration", pomo_end:"Faites une pause!", lang_select:"Choisissez la langue", lang_desc:"Modifiable dans les paramètres", prompt_ws:"Nom de l'espace:", days: ['Lu','Ma','Me','Je','Ve','Sa','Di'] },
+            es: { app_title:"Aplicaciones", nav_tasks:"Tareas", nav_calendar:"Calendario", nav_dashboard:"Análisis", nav_settings:"Ajustes", ws_title:"Espacios", ws_create:"Crear", ws_personal:"Personal", ws_work:"Trabajo", btn_install:"Instalar App", board_desc:"Gestiona tus tareas", ph_task:"¿Qué hay que hacer? Enter...", prio_low:"Bajo", prio_med:"Medio", prio_high:"Alto", col_todo:"Por Hacer", col_ip:"En Progreso", col_done:"Hecho", cal_title:"Calendario", dash_title:"Analíticas", dash_desc:"Estadísticas", stat_done:"Completadas", stat_total:"total", stat_focus:"Enfoque & XP", stat_xp_desc:"Puntos (XP)", stat_pomo:"Pomodoros:", stat_p_sessions:"sesiones", stat_streak:"Racha:", stat_s_days:"días", ach_title:"Salón de la Fama", ach1_t:"Primera Sangre", ach1_d:"Primera tarea", ach2_t:"Maratonista", ach2_d:"5 tareas listas", ach3_t:"Señor Tomate", ach3_d:"3 sesiones", ach4_t:"En llamas", ach4_d:"Racha de 3 días", lvl_up:"¡NIVEL SUPERADO!", lvl_up_msg:"Felicidades por llegar al nivel", toast_achive:"¡Logro desbloqueado!", pomo_mode:"Modo Enfoque", pomo_end:"¡Descansa!", lang_select:"Selecciona idioma", lang_desc:"Cambia luego en ajustes", prompt_ws:"Nombre del espacio:", days: ['Lu','Ma','Mi','Ju','Vi','Sá','Do'] },
+            it: { app_title:"Applicazioni", nav_tasks:"Compiti", nav_calendar:"Calendario", nav_dashboard:"Cruscotto", nav_settings:"Impostazioni", ws_title:"Spazi", ws_create:"Crea", ws_personal:"Personale", ws_work:"Lavoro", btn_install:"Installa App", board_desc:"Gestisci compiti", ph_task:"Cosa devi fare? Invio...", prio_low:"Basso", prio_med:"Medio", prio_high:"Alto", col_todo:"Da Fare", col_ip:"In Corso", col_done:"Fatto", cal_title:"Calendario", dash_title:"Analisi", dash_desc:"Statistiche", stat_done:"Completati", stat_total:"totale", stat_focus:"Concentrazione XP", stat_xp_desc:"Punti (XP)", stat_pomo:"Pomodori:", stat_p_sessions:"sessioni", stat_streak:"Serie:", stat_s_days:"giorni", ach_title:"Sala d'Onore", ach1_t:"Primo Sangue", ach1_d:"Primo compito", ach2_t:"Maratoneta", ach2_d:"5 compiti completati", ach3_t:"Signore d Pomodoro", ach3_d:"3 sessioni", ach4_t:"A fuoco", ach4_d:"Serie 3 giorni", lvl_up:"LIVELLO SUPERATO!", lvl_up_msg:"Congratulazioni, livello", toast_achive:"Obiettivo sbloccato!", pomo_mode:"Focus", pomo_end:"Pausa!", lang_select:"Seleziona la lingua", lang_desc:"Modificabile nelle impostazioni", prompt_ws:"Nome dello spazio:", days: ['Lu','Ma','Me','Gi','Ve','Sa','Do'] },
+            uk: { app_title:"Програми", nav_tasks:"Завдання", nav_calendar:"Календар", nav_dashboard:"Аналітика", nav_settings:"Налаштування", ws_title:"Простори", ws_create:"Створити", ws_personal:"Особисте", ws_work:"Робота", btn_install:"Встановити App", board_desc:"Управління завданнями", ph_task:"Що зробити? Enter...", prio_low:"Низький", prio_med:"Середній", prio_high:"Високий", col_todo:"До виконання", col_ip:"В процесі", col_done:"Готово", cal_title:"Календар дедлайнів", dash_title:"Аналітика", dash_desc:"Статистика", stat_done:"Виконано", stat_total:"всього", stat_focus:"Фокус & XP", stat_xp_desc:"Очок (XP)", stat_pomo:"Помодоро:", stat_p_sessions:"сесій", stat_streak:"Стрик:", stat_s_days:"днів", ach_title:"Зала слави", ach1_t:"Перша кров", ach1_d:"Перше завдання", ach2_t:"Марафонець", ach2_d:"5 завдань", ach3_t:"Томатний лорд", ach3_d:"3 сесії", ach4_t:"У вогні", ach4_d:"Стрик 3 дні", lvl_up:"РІВЕНЬ ПІДВИЩЕНО!", lvl_up_msg:"Вітаємо з новим", toast_achive:"Досягнення розблоковано!", pomo_mode:"Режим фокусу", pomo_end:"Час відпочити!", lang_select:"Оберіть мову", lang_desc:"Змінюється в налаштуваннях", prompt_ws:"Назва простору:", days: ['Пн','Вв','Ср','Чт','Пт','Сб','Нд'] },
+            zh: { app_title:"应用", nav_tasks:"任务", nav_calendar:"日历", nav_dashboard:"分析", nav_settings:"设置", ws_title:"工作区", ws_create:"创建", ws_personal:"个人", ws_work:"工作", btn_install:"安装应用", board_desc:"管理任务和想法", ph_task:"需要做什么？按回车...", prio_low:"低", prio_med:"中", prio_high:"高", col_todo:"待办", col_ip:"进行中", col_done:"已完成", cal_title:"截止日期日历", dash_title:"您的分析", dash_desc:"生产力统计", stat_done:"已完成", stat_total:"总计", stat_focus:"专注 & XP", stat_xp_desc:"生产力点数 (XP)", stat_pomo:"番茄钟:", stat_p_sessions:"次", stat_streak:"连续:", stat_s_days:"天", ach_title:"名人堂", ach1_t:"第一滴血", ach1_d:"第一个任务", ach2_t:"马拉松", ach2_d:"完成5个", ach3_t:"番茄领主", ach3_d:"3次专注", ach4_t:"火力全开", ach4_d:"保持3天", lvl_up:"升级！", lvl_up_msg:"恭喜达到新等级", toast_achive:"解锁成就！", pomo_mode:"专注模式", pomo_end:"休息一下！", lang_select:"选择您的语言", lang_desc:"稍后可在设置中更改", prompt_ws:"新工作区名称:", days: ['一','二','三','四','五','六','日'] }
+        };
+
         const DB_KEY = 'TF_OS_DB';
         const defaultState = {
             version: '4.0',
-            settings: { theme: '#8A2BE2', themeRgb: '138,43,226' },
+            settings: { theme: '#8A2BE2', lang: null }, // lang trigger
             user: { xp: 0, level: 1, streakCount: 0, lastLoginDate: '', pomoCompleted: 0, achieved: [] },
             workspaces: [
-                { id: 'ws_default', name: 'Личное', icon: '🏠', color: '#3b82f6' },
-                { id: 'ws_work', name: 'Работа', icon: '💼', color: '#ef4444' }
+                { id: 'ws_default', key: 'ws_personal', icon: '🏠', color: '#3b82f6' },
+                { id: 'ws_work', key: 'ws_work', icon: '💼', color: '#ef4444' }
             ],
             activeWs: 'ws_default',
-            tasks: [] // {id, wsId, title, st, prio, date}
+            tasks: []
         };
 
         const achivementsList = [
-            { id: 'a_first', icon: '👶', title: 'Первая кровь', desc: 'Добавил первую задачу', req: state => state.tasks.length > 0 },
-            { id: 'a_done5', icon: '🏃', title: 'Марафонец', desc: 'Закрыл 5 задач', req: state => state.tasks.filter(t=>t.st==='done').length >= 5 },
-            { id: 'a_pomo3', icon: '🍅', title: 'Томатный лорд', desc: 'Сделал 3 фокус-сессии', req: state => state.user.pomoCompleted >= 3 },
-            { id: 'a_streak3', icon: '🔥', title: 'В ударе', desc: 'Поддерживал стрик 3 дня', req: state => state.user.streakCount >= 3 }
+            { id: 'a_first', icon: '👶', titleKey: 'ach1_t', descKey: 'ach1_d', req: state => state.tasks.length > 0 },
+            { id: 'a_done5', icon: '🏃', titleKey: 'ach2_t', descKey: 'ach2_d', req: state => state.tasks.filter(t=>t.st==='done').length >= 5 },
+            { id: 'a_pomo3', icon: '🍅', titleKey: 'ach3_t', descKey: 'ach3_d', req: state => state.user.pomoCompleted >= 3 },
+            { id: 'a_streak3', icon: '🔥', titleKey: 'ach4_t', descKey: 'ach4_d', req: state => state.user.streakCount >= 3 }
         ];
 
         let db = JSON.parse(localStorage.getItem(DB_KEY));
-        if(!db || !db.version) { db = JSON.parse(JSON.stringify(defaultState)); }
+        if(!db || !db.version || db.version !== '4.0') { db = JSON.parse(JSON.stringify(defaultState)); }
         
         function saveDB() {
             localStorage.setItem(DB_KEY, JSON.stringify(db));
             checkAchievements();
             renderUserStats();
+        }
+
+        // Translation Engine
+        function t(key) {
+            const lang = db.settings.lang || 'en';
+            return i18n[lang][key] || key;
+        }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                el.innerText = t(k);
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const k = el.getAttribute('data-i18n-placeholder');
+                el.setAttribute('placeholder', t(k));
+            });
+            // Update calendar headers Day of Week
+            const cd = document.getElementById('calDaysRow');
+            if(cd) {
+                cd.innerHTML = i18n[db.settings.lang || 'en'].days.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+            }
+        }
+
+        function setLang(code) {
+            db.settings.lang = code;
+            saveDB();
+            applyTranslations();
+            switchView('board'); // Jump to app
+            document.documentElement.lang = code;
         }
 
         // SFX 
@@ -420,9 +482,19 @@
             let nav = document.querySelector(`.nav-item[data-target="${viewId}"]`);
             if(nav) nav.classList.add('active');
 
-            if(viewId === 'board') renderBoard();
-            if(viewId === 'calendar') renderCalendar();
-            if(viewId === 'dashboard') renderDashboard();
+            const sb = document.getElementById('appSidebar');
+            const pmo = document.getElementById('appPomodoro');
+            
+            if(viewId === 'language') {
+                sb.classList.add('hidden');
+                pmo.classList.add('hidden');
+            } else {
+                sb.classList.remove('hidden');
+                pmo.classList.remove('hidden');
+                if(viewId === 'board') renderBoard();
+                if(viewId === 'calendar') renderCalendar();
+                if(viewId === 'dashboard') renderDashboard();
+            }
         }
 
         function renderWorkspaces() {
@@ -430,10 +502,11 @@
             list.innerHTML = '';
             db.workspaces.forEach(ws => {
                 const isActive = ws.id === db.activeWs;
+                const dName = ws.key ? t(ws.key) : ws.name;
                 list.innerHTML += `
                     <div class="nav-item ${isActive?'active':''}" style="padding-left:20px;" onclick="selectWs('${ws.id}')">
                         <span class="workspace-badge" style="background:${ws.color};"></span>
-                        ${ws.icon} ${ws.name}
+                        ${ws.icon} ${dName}
                     </div>
                 `;
             });
@@ -447,12 +520,10 @@
         }
 
         function addWorkspace() {
-            let n = prompt("Название нового Workspace:");
+            let n = prompt(t('prompt_ws'));
             if(!n) return;
             const colors = ['#f43f5e', '#8b5cf6', '#d946ef', '#10b981', '#f59e0b', '#0ea5e9'];
-            db.workspaces.push({
-                id: 'ws_'+Date.now(), name: n, icon: '📁', color: colors[Math.floor(Math.random()*colors.length)]
-            });
+            db.workspaces.push({ id: 'ws_'+Date.now(), name: n, icon: '📁', color: colors[Math.floor(Math.random()*colors.length)] });
             saveDB(); renderWorkspaces();
         }
 
@@ -470,56 +541,56 @@
             if(db.user.xp >= req) {
                 db.user.level++;
                 db.user.xp -= req;
-                showToast('УРОВЕНЬ ПОВЫШЕН!', `Поздравляем с новым ${db.user.level} уровнем!`, '🆙');
+                showToast(t('lvl_up'), `${t('lvl_up_msg')} ${db.user.level}!`, '🆙');
                 sfx('fanfare');
             }
             saveDB();
         }
 
         // --- 3. BOARD & TASKS LOGIC ---
+        function pMd(str) {
+            return str.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                      .replace(/\*(.*?)\*/g, '<i>$1</i>')
+                      .replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.2);padding:2px 4px;border-radius:4px;">$1</code>')
+                      .replace(/~~(.*?)~~/g, '<del>$1</del>');
+        }
+
         let boardIsList = false;
         function toggleBoardMode() {
             boardIsList = !boardIsList;
             document.getElementById('boardArea').className = boardIsList ? 'board-container mode-list' : 'board-container mode-kanban';
         }
 
-        // Markdown Parser (Super Simple)
-        function pMd(t) {
-            return t.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-                    .replace(/\*(.*?)\*/g, '<i>$1</i>')
-                    .replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.2);padding:2px 4px;border-radius:4px;">$1</code>')
-                    .replace(/~~(.*?)~~/g, '<del>$1</del>');
-        }
-
         function renderBoard() {
             const ws = db.workspaces.find(w => w.id === db.activeWs);
-            document.getElementById('currentWsTitle').innerHTML = `${ws.icon} ${ws.name}`;
+            const dName = ws.key ? t(ws.key) : ws.name;
+            document.getElementById('currentWsTitle').innerHTML = `${ws.icon} ${dName}`;
 
-            const tTasks = db.tasks.filter(t => t.wsId === ws.id);
+            const tTasks = db.tasks.filter(ti => ti.wsId === ws.id);
             const cols = { todo: [], in_progress: [], done: [] };
-            tTasks.forEach(t => { if(cols[t.st]) cols[t.st].push(t); });
+            tTasks.forEach(ti => { if(cols[ti.st]) cols[ti.st].push(ti); });
 
             ['todo', 'in_progress', 'done'].forEach(col => {
                 document.getElementById(`c-${col==='in_progress'?'ip':col}`).innerText = cols[col].length;
                 const el = document.getElementById(`col-${col}`);
                 el.innerHTML = '';
-                cols[col].forEach(t => {
-                    const isD = t.st === 'done';
+                cols[col].forEach(ti => {
+                    const isD = ti.st === 'done';
                     el.innerHTML += `
-                        <div class="task-item ${isD?'done':''}" draggable="true" ondragstart="dragT(event, '${t.id}')">
+                        <div class="task-item ${isD?'done':''}" draggable="true" ondragstart="dragT(event, '${ti.id}')">
                             <div class="task-head">
                                 <label class="chk-container" onclick="event.stopPropagation()">
-                                    <input type="checkbox" onchange="toggleT('${t.id}')" ${isD?'checked':''}>
+                                    <input type="checkbox" onchange="toggleT('${ti.id}')" ${isD?'checked':''}>
                                     <div class="chk-mark"></div>
                                 </label>
-                                <div class="task-title">${pMd(t.title)}</div>
+                                <div class="task-title">${pMd(ti.title)}</div>
                             </div>
                             <div class="task-badges">
-                                <span class="dot p-${t.prio}"></span>
-                                ${t.date ? `<span class="badge"><i class="fa-solid fa-clock"></i> ${t.date}</span>` : ''}
+                                <span class="dot p-${ti.prio}"></span>
+                                ${ti.date ? `<span class="badge"><i class="fa-solid fa-clock"></i> ${ti.date}</span>` : ''}
                             </div>
                             <div class="task-actions">
-                                <button class="act-btn del" onclick="delT('${t.id}')"><i class="fa-solid fa-trash"></i></button>
+                                <button class="act-btn del" onclick="delT('${ti.id}')"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                     `;
@@ -543,42 +614,38 @@
         }
 
         function toggleT(id) {
-            const t = db.tasks.find(x => x.id === id);
-            if(t) {
-                if(t.st !== 'done') { t.st = 'done'; addXp(15); sfx('pop'); }
-                else { t.st = 'todo'; }
+            const ti = db.tasks.find(x => x.id === id);
+            if(ti) {
+                if(ti.st !== 'done') { ti.st = 'done'; addXp(15); sfx('pop'); }
+                else { ti.st = 'todo'; }
                 saveDB(); renderBoard();
             }
         }
-        function delT(id) {
-            db.tasks = db.tasks.filter(x => x.id !== id);
-            saveDB(); renderBoard();
-        }
+        function delT(id) { db.tasks = db.tasks.filter(x => x.id !== id); saveDB(); renderBoard(); }
 
-        // Drag Drop Task
         let dragId = null;
         function dragT(e, id) { dragId = id; setTimeout(()=>e.target.classList.add('dragging'),0); }
         function allowDrop(e) { e.preventDefault(); }
         function dropTask(e, stat) {
             e.preventDefault();
             if(dragId) {
-                const t = db.tasks.find(x=>x.id === dragId);
-                if(t && t.st !== stat) {
+                const ti = db.tasks.find(x=>x.id === dragId);
+                if(ti && ti.st !== stat) {
                     if(stat === 'done') addXp(15);
-                    t.st = stat; saveDB(); renderBoard();
+                    ti.st = stat; saveDB(); renderBoard();
                 }
             }
             dragId = null; document.querySelectorAll('.dragging').forEach(n=>n.classList.remove('dragging'));
         }
         document.addEventListener('dragend', ()=> { document.querySelectorAll('.dragging').forEach(n=>n.classList.remove('dragging')); });
 
-        // --- 4. CALENDAR LOGIC ---
+        // --- 4. CALENDAR ---
         let calDate = new Date();
         function renderCalendar() {
             const title = document.getElementById('calMonthTitle');
             const grid = document.getElementById('calGrid');
             
-            const monthStr = calDate.toLocaleString('ru', { month: 'long', year: 'numeric' });
+            const monthStr = calDate.toLocaleString(db.settings.lang || 'en', { month: 'long', year: 'numeric' });
             title.innerText = monthStr.charAt(0).toUpperCase() + monthStr.slice(1);
             grid.innerHTML = '';
 
@@ -586,33 +653,27 @@
             const firstDay = new Date(y, m, 1).getDay();
             const daysInMonth = new Date(y, m+1, 0).getDate();
             
-            // Adjust JS Sunday(0) to Monday(1) indexing
             let offset = firstDay === 0 ? 6 : firstDay - 1;
-
-            // Tasks mapping
             const tMap = {};
-            db.tasks.forEach(t => {
-                if(t.date && t.st !== 'done') {
-                    if(!tMap[t.date]) tMap[t.date] = [];
-                    tMap[t.date].push(t);
+            db.tasks.forEach(ti => {
+                if(ti.date && ti.st !== 'done') {
+                    if(!tMap[ti.date]) tMap[ti.date] = [];
+                    tMap[ti.date].push(ti);
                 }
             });
 
             const todayStr = new Date().toISOString().split('T')[0];
-
             for(let i=0; i<offset; i++) grid.innerHTML += `<div class="cal-cell disabled"></div>`;
 
             for(let d=1; d<=daysInMonth; d++) {
                 let cellDate = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 let isToday = cellDate === todayStr;
-                
                 let tasksHtml = '';
                 if(tMap[cellDate]) {
-                    tMap[cellDate].forEach(t => {
-                        tasksHtml += `<div class="cal-task-dot" style="background:${getBadgeColor(t.wsId)}">${t.title}</div>`;
+                    tMap[cellDate].forEach(ti => {
+                        tasksHtml += `<div class="cal-task-dot" style="background:${getBadgeColor(ti.wsId)}">${ti.title}</div>`;
                     });
                 }
-                
                 grid.innerHTML += `
                     <div class="cal-cell ${isToday?'today':''}">
                         <div class="cal-date-num">${d}</div>
@@ -626,19 +687,17 @@
 
         // --- 5. DASHBOARD & ACHIEVEMENTS ---
         function renderDashboard() {
-            const doneC = db.tasks.filter(t=>t.st==='done').length;
+            const doneC = db.tasks.filter(ti=>ti.st==='done').length;
             const total = db.tasks.length;
             document.getElementById('stDone').innerText = doneC;
             document.getElementById('stTotal').innerText = total;
             document.getElementById('stXp').innerText = db.user.xp + (db.user.level-1)*100;
-            document.getElementById('stPomoCount').innerText = db.user.pomoCompleted + ' сессий';
-            document.getElementById('stStreakVal').innerText = db.user.streakCount + ' дней 🔥';
+            document.getElementById('stPomoCount').innerText = db.user.pomoCompleted;
+            document.getElementById('stStreakVal').innerText = db.user.streakCount;
 
-            // SVG Donut Render
             const svgC = document.getElementById('chartTasks');
             let percent = total === 0 ? 0 : Math.round((doneC/total)*100);
-            let dashVal = (percent * 283) / 100; // 283 is circle circumference
-            
+            let dashVal = (percent * 283) / 100; 
             svgC.innerHTML = `
                 <svg viewBox="0 0 100 100" style="width:100%; height:100%; transform: rotate(-90deg);">
                     <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="10" />
@@ -648,7 +707,6 @@
                 <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.8rem; font-weight:bold;">${percent}%</div>
             `;
 
-            // Achievements Render
             const achGrid = document.getElementById('achievementsGrid');
             achGrid.innerHTML = '';
             achivementsList.forEach(a => {
@@ -657,8 +715,8 @@
                     <div style="background: rgba(255,255,255,0.05); border: 1px solid ${isUnlocked?'gold':'var(--glass-border)'}; opacity: ${isUnlocked?1:0.4}; border-radius: 12px; padding:15px; width: 100%; max-width:260px; display:flex; gap:15px; align-items:center;">
                         <div style="font-size: 2.5rem; filter: ${isUnlocked?'none':'grayscale(100%)'};">${a.icon}</div>
                         <div>
-                            <h4 style="margin:0; color:${isUnlocked?'gold':'white'};">${a.title}</h4>
-                            <p style="margin:5px 0 0 0; font-size:0.8rem; color:gray;">${a.desc}</p>
+                            <h4 style="margin:0; color:${isUnlocked?'gold':'white'};">${t(a.titleKey)}</h4>
+                            <p style="margin:5px 0 0 0; font-size:0.8rem; color:gray;">${t(a.descKey)}</p>
                         </div>
                     </div>
                 `;
@@ -670,9 +728,8 @@
                 if(!db.user.achieved.includes(a.id)) {
                     if(a.req(db)) {
                         db.user.achieved.push(a.id);
-                        showToast('Achievement Unlocked!', a.title, a.icon);
-                        addXp(100);
-                        sfx('fanfare');
+                        showToast(t('toast_achive'), t(a.titleKey), a.icon);
+                        addXp(100); sfx('fanfare');
                     }
                 }
             });
@@ -694,7 +751,7 @@
                     if(pTime>0){ pTime--; updatePomo(); }
                     else {
                         clearInterval(pInt); pRun=false; 
-                        sfx('fanfare'); showToast("Time's Up!", "Фокус завершен. Отдыхаем!", "🍅");
+                        sfx('fanfare'); showToast("Time's Up!", t('pomo_end'), "🍅");
                         db.user.pomoCompleted++; saveDB(); addXp(50);
                         pTime = 5 * 60; updatePomo(); // Break
                     }
@@ -713,101 +770,63 @@
             setTimeout(() => { el.style.animation = 'fadeOut 0.5s ease forwards'; setTimeout(()=>el.remove(),500); }, 4000);
         }
 
-        // --- STREAK CHECK (Login Daily) ---
+        // STREAK & INIT 
         function checkDailyStreak() {
             const today = new Date().toISOString().split('T')[0];
             if(db.user.lastLoginDate !== today) {
-                // Check if missed a day
                 let yest = new Date(); yest.setDate(yest.getDate()-1);
                 const yestStr = yest.toISOString().split('T')[0];
-                
-                if(db.user.lastLoginDate === yestStr) {
-                    db.user.streakCount++;
-                } else if(db.user.lastLoginDate !== '') {
-                    db.user.streakCount = 1; // reset broken streak
-                } else {
-                    db.user.streakCount = 1; // first time
-                }
-                db.user.lastLoginDate = today;
-                saveDB();
+                if(db.user.lastLoginDate === yestStr) db.user.streakCount++;
+                else if(db.user.lastLoginDate !== '') db.user.streakCount = 1;
+                else db.user.streakCount = 1;
+                db.user.lastLoginDate = today; saveDB();
             }
         }
 
-        // --- TELEGRAM REMINDERS PUSH ---
-        const TG_BOT = localStorage.getItem('TF_TG_BOT') || '';
-        const TG_CHAT = localStorage.getItem('TF_TG_CHAT') || '';
-        
+        document.addEventListener('DOMContentLoaded', () => {
+            checkDailyStreak();
+            if(!db.settings.lang) {
+                switchView('language');
+            } else {
+                applyTranslations();
+                document.documentElement.lang = db.settings.lang;
+                renderWorkspaces();
+                renderUserStats();
+                switchView('board');
+            }
+        });
+
+        // TG Bot Reminders
         setInterval(() => {
+            const TG_BOT = localStorage.getItem('TF_TG_BOT');
+            const TG_CHAT = localStorage.getItem('TF_TG_CHAT');
             if(!TG_BOT || !TG_CHAT) return;
             const now = new Date().toISOString().split('T')[0];
-            db.tasks.forEach(t => {
-                if(t.date === now && t.st !== 'done' && !t.reminded) {
+            db.tasks.forEach(ti => {
+                if(ti.date === now && ti.st !== 'done' && !ti.reminded) {
                     fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage`, {
-                        method: 'POST',
-                        headers:{'Content-Type':'application/json'},
-                        body: JSON.stringify({
-                            chat_id: TG_CHAT, text: `⚠️ ДЕДЛАЙН СЕГОДНЯ!\n\nЗадача: ${t.title}\nВоркспейс: ${db.workspaces.find(w=>w.id===t.wsId)?.name}\nСрочно закрывай!`
-                        })
-                    }).then(r => { if(r.ok) { t.reminded = true; saveDB(); } });
+                        method: 'POST', headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify({ chat_id: TG_CHAT, text: `⚠️ ДЕДЛАЙН!\n\n${ti.title}` })
+                    }).then(r => { if(r.ok) { ti.reminded = true; saveDB(); } });
                 }
             });
         }, 60000);
 
-        // --- INIT APP ---
-        document.addEventListener('DOMContentLoaded', () => {
-            checkDailyStreak();
-            renderWorkspaces();
-            renderUserStats();
-            switchView('board');
-        });
-
-        // ==========================================
-        // 🔮 PWA MAGIC: Virtual Service Worker & Manifest
-        // ==========================================
-        const manifestData = {
-            "name": "TaskFlow Elite OS",
-            "short_name": "TaskFlow OS",
-            "start_url": ".",
-            "display": "standalone",
-            "background_color": "#0b0f19",
-            "theme_color": "#8A2BE2",
-            "description": "Ultimate OS for Productivity",
-            "icons": [{
-                "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzhiNWNmNiIvPjxwYXRoIGQ9Ik0yNSA1MCBsMTUgMTUgbDM1IC0zNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIxMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+",
-                "sizes": "512x512", "type": "image/svg+xml"
-            }]
-        };
-
-        // Create Manifest Blob dynamically
-        let manBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/manifest+json'});
-        let manUrl = URL.createObjectURL(manBlob);
-        document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manUrl}">`);
-
-        // Create Service Worker Blob dynamically
-        const swCode = `
-            self.addEventListener('install', (e) => { self.skipWaiting(); });
-            self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(()=>new Response("Offline Mode"))); });
-        `;
+        // PWA
+        const swCode = `self.addEventListener('install', (e) => { self.skipWaiting(); }); self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(()=>new Response("Offline Mode"))); });`;
         let swBlob = new Blob([swCode], {type: 'application/javascript'});
-        let swUrl = URL.createObjectURL(swBlob);
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log(err));
 
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW setup failed: ', err));
-        }
-
-        // PWA Install Prompt Logic
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
+            e.preventDefault(); deferredPrompt = e;
             document.getElementById('btnInstallPwa').style.display = 'flex';
         });
-
         document.getElementById('btnInstallPwa').addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') { document.getElementById('btnInstallPwa').style.display = 'none'; }
+                if (outcome === 'accepted') document.getElementById('btnInstallPwa').style.display = 'none';
                 deferredPrompt = null;
             }
         });
